@@ -110,7 +110,7 @@ export function LandingScreen({
 
         <section className={styles.videoSec} aria-labelledby="video-title">
           <div className={styles.videoHead}>
-            <h2 id="video-title">70 秒，看清我们在做什么</h2>
+            <h2 id="video-title">78 秒，看清我们在做什么</h2>
             <p>产品实机画面，不配音也看得懂；想亲手试，往下走。</p>
           </div>
           <video
