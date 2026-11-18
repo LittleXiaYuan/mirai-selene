@@ -1,4 +1,4 @@
-"""部署到阿里云服务器：YOUR_SERVER_IP。
+"""部署到阿里云服务器：47.104.99.131。
 
 架构：
     CDN (120.220.39.x, *.cloudtori.cn 通配证书终止 TLS)
@@ -21,7 +21,7 @@ import time
 
 import paramiko
 
-HOST = os.environ.get("MIRAI_HOST", "YOUR_SERVER_IP")
+HOST = os.environ.get("MIRAI_HOST", "47.104.99.131")
 USER = os.environ.get("MIRAI_USER", "root")
 PASS = os.environ.get("MIRAI_PASS", "")
 MINIMAX_KEY = os.environ.get("MINIMAX_KEY", "")
@@ -130,22 +130,56 @@ chmod 750 {REMOTE}/data
 ls {REMOTE}
 """)
 
-    print("→ 写环境文件")
-    env_lines = [
-        f"PORT={PORT}",
-        "HOST=0.0.0.0",
-        f"MIRAI_DATA={REMOTE}/data/mirai.db",
-        f"MINIMAX_API_KEY={MINIMAX_KEY}",
-        "MINIMAX_MODEL=MiniMax-Text-01",
-        # CDN 已终止 TLS；源站若也要 443（CDN 回源走 HTTPS），就填这两行
-        f"MIRAI_TLS_CERT={REMOTE}/certs/mirai.fullchain.pem",
-        f"MIRAI_TLS_KEY={REMOTE}/certs/mirai.key",
-        "MIRAI_TLS_PORT=443",
-    ]
-    env_body = "\n".join(env_lines) + "\n"
+    print("→ 写环境文件（保留已有的 SMTP / CORS / Studio 配置）")
+    # 旧版这里是整份重写，配过的 SMTP、跨域白名单会被清空；
+    # 现在先读远端 .env，再把本次要覆盖的键合并进去。
+    preserved = {}
+    try:
+        with sftp.file(f"{REMOTE}/.env", "r") as f:
+            for line in f.read().decode("utf-8", "replace").splitlines():
+                line = line.strip()
+                if not line or line.startswith("#") or "=" not in line:
+                    continue
+                key, value = line.split("=", 1)
+                preserved[key.strip()] = value
+    except OSError:
+        preserved = {}
+
+    env = {
+        "PORT": PORT,
+        "HOST": "0.0.0.0",
+        "MIRAI_DATA": f"{REMOTE}/data/mirai.db",
+        "MINIMAX_API_KEY": MINIMAX_KEY or preserved.get("MINIMAX_API_KEY", ""),
+        "MINIMAX_MODEL": os.environ.get("MINIMAX_MODEL")
+        or preserved.get("MINIMAX_MODEL", "MiniMax-Text-01"),
+        "MIRAI_TLS_CERT": f"{REMOTE}/certs/mirai.fullchain.pem",
+        "MIRAI_TLS_KEY": f"{REMOTE}/certs/mirai.key",
+        "MIRAI_TLS_PORT": "443",
+    }
+    # 这些键本次没传就沿用远端旧值；传了才覆盖。
+    for key in (
+        "SMTP_HOST",
+        "SMTP_PORT",
+        "SMTP_USER",
+        "SMTP_PASS",
+        "SMTP_FROM",
+        "MIRAI_APP_URL",
+        "MIRAI_CORS_ORIGINS",
+        "MIRAI_STUDIO_URL",
+        "MIRAI_SECURE_COOKIE",
+        "MIRAI_MAGIC_LOGIN",
+    ):
+        value = os.environ.get(key) or preserved.get(key)
+        if value:
+            env[key] = value
+
+    env_body = "".join(f"{key}={value}\n" for key, value in env.items())
     with sftp.file(f"{REMOTE}/.env", "w") as f:
         f.write(env_body)
     sftp.chmod(f"{REMOTE}/.env", 0o600)
+
+    if not env.get("MINIMAX_API_KEY"):
+        print("  ⚠ MINIMAX_API_KEY 为空：线上会退回本地分支，请用 MINIMAX_KEY 再部署一次")
 
     print("→ 写 systemd 服务")
     with sftp.file("/etc/systemd/system/mirai.service", "w") as f:

@@ -12,7 +12,7 @@
 
 ## 不包含
 
-- 模型权重（`*.pt`）：见 ModelScope `XiaYuanOvO/pai-ssm-490m`
+- 模型权重（`*.pt`）：见 ModelScope `XiaYuanOvO/pai-ssm`
 - 比赛 PPT / 宣传片 / 海报 / 分镜素材
 - `components.json`（内含 Arc registry 的 license key）
 - `.env`、数据库、运行日志

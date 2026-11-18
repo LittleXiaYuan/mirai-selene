@@ -8,7 +8,7 @@
 | 项 | 说明 |
 |---|---|
 | 是否在仓库里 | 否。仓库不包含任何 `.pt` / `.safetensors` |
-| 托管位置 | ModelScope：`XiaYuanOvO/pai-ssm-490m` |
+| 托管位置 | ModelScope：`XiaYuanOvO/pai-ssm` |
 | 可下载内容 | `weights/pai_ssm_490m_bf16.pt`（约 936 MB，490M 参数，BF16） |
 | 用途许可 | **研究与评测免费**；商业使用、二次分发、对外提供服务需书面授权 |
 | 训练数据 | 当前权重在合成博弈与声学韵律数据上训练，不含真实用户录音 |
