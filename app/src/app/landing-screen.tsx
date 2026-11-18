@@ -108,6 +108,24 @@ export function LandingScreen({
           </div>
         </section>
 
+        <section className={styles.videoSec} aria-labelledby="video-title">
+          <div className={styles.videoHead}>
+            <h2 id="video-title">70 秒，看清我们在做什么</h2>
+            <p>产品实机画面，不配音也看得懂；想亲手试，往下走。</p>
+          </div>
+          <video
+            className={styles.video}
+            controls
+            playsInline
+            preload="metadata"
+            poster="/promo/mirai-promo-poster.jpg"
+          >
+            <source src="/promo/mirai-promo.mp4" type="video/mp4" />
+            你的浏览器不支持 video 标签，可以直接下载
+            <a href="/promo/mirai-promo.mp4">宣传片</a>。
+          </video>
+        </section>
+
         <section className={styles.capabilities} aria-labelledby="cap-title">
           <h2 id="cap-title">四件事，缺一件就不成立</h2>
           <div className={styles.grid}>

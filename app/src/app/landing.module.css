@@ -186,7 +186,41 @@
   font-size: var(--text-xs);
 }
 
+.videoSec {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.videoHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-2) var(--space-4);
+}
+
+.videoHead h2 {
+  margin: 0;
+}
+
+.videoHead p {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+}
+
+.video {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  display: block;
+  background: #000;
+  border-radius: var(--radius-panel);
+  border: 1px solid color-mix(in oklab, var(--border) 60%, transparent);
+  box-shadow: var(--shadow-floating);
+}
+
 .capabilities h2,
+.videoSec h2,
 .showcase h2,
 .engine h2,
 .cta h2 {
