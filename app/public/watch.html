@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mirai-Selene · 70 秒宣传片</title>
+<meta name="theme-color" content="#080910">
+<style>
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; }
+  body {
+    background:
+      radial-gradient(900px 520px at 72% -10%, rgba(109,94,252,.22), transparent 62%),
+      radial-gradient(700px 460px at 8% 10%, rgba(94,234,212,.10), transparent 60%),
+      #080910;
+    color: #e8ecff;
+    font-family: "Inter", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+    display: flex;
+    flex-direction: column;
+    min-height: 100dvh;
+  }
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: calc(14px + env(safe-area-inset-top, 0px)) 20px;
+    border-bottom: 1px solid rgba(255,255,255,.07);
+  }
+  .brand { font-weight: 600; letter-spacing: .02em; }
+  .brand span { color: #8b7dff; }
+  header a {
+    color: #98a1bb;
+    text-decoration: none;
+    font-size: 13px;
+    padding: 6px 10px;
+    border: 1px solid rgba(255,255,255,.12);
+    border-radius: 999px;
+  }
+  header a:hover { color: #e8ecff; border-color: rgba(255,255,255,.24); }
+  main {
+    flex: 1;
+    display: grid;
+    place-items: center;
+    padding: 20px;
+  }
+  .frame {
+    position: relative;
+    width: min(1180px, 100%);
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,.12);
+    background: #000;
+    box-shadow: 0 30px 80px rgba(0,0,0,.55);
+    aspect-ratio: 16 / 9;
+  }
+  video { width: 100%; height: 100%; display: block; background: #000; }
+  .sound {
+    position: absolute;
+    right: 14px;
+    bottom: 58px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 14px;
+    border-radius: 999px;
+    border: 1px solid rgba(255,255,255,.22);
+    background: rgba(9,11,18,.78);
+    backdrop-filter: blur(10px);
+    color: #fff;
+    font-size: 13.5px;
+    cursor: pointer;
+    transition: .16s ease;
+  }
+  .sound:hover { background: rgba(9,11,18,.92); border-color: rgba(255,255,255,.4); }
+  .meta {
+    width: min(1180px, 100%);
+    margin: 14px auto 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 16px;
+    color: #98a1bb;
+    font-size: 12.5px;
+  }
+  .meta b { color: #e8ecff; font-weight: 500; }
+  .hint { margin-left: auto; }
+  @media (max-width: 640px) {
+    main { padding: 10px; }
+    .sound { right: 10px; bottom: 52px; }
+    .hint { margin-left: 0; }
+  }
+</style>
+</head>
+<body>
+  <header>
+    <div class="brand">Mirai<span>·</span>Selene</div>
+    <a href="/">返回主站</a>
+  </header>
+
+  <main>
+    <div class="frame">
+      <video
+        id="v"
+        src="/promo/mirai-promo.mp4"
+        poster="/promo/mirai-promo-poster.jpg"
+        controls
+        playsinline
+        autoplay
+        muted
+        preload="metadata"
+      ></video>
+      <button class="sound" id="sound" type="button">🔊 开启声音</button>
+    </div>
+  </main>
+
+  <div class="meta">
+    <span><b>70 秒</b> 宣传片 · 1080p 原片</span>
+    <span>默认静音起播；声音需要点一下（浏览器策略）</span>
+    <a class="hint" href="/promo/mirai-promo.mp4" style="color:#8b7dff;text-decoration:none">直接下载 mp4</a>
+  </div>
+
+<script>
+  const v = document.getElementById("v");
+  const btn = document.getElementById("sound");
+  btn.addEventListener("click", async () => {
+    v.muted = false;
+    v.volume = 1;
+    try { await v.play(); } catch {}
+    btn.remove();
+  });
+  v.addEventListener("volumechange", () => {
+    if (!v.muted && btn.isConnected) btn.textContent = "🔊 已开启声音";
+  });
+</script>
+</body>
+</html>

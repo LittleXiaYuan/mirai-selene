@@ -537,11 +537,38 @@ function serveStatic(req, res, pathname) {
   const ext = extname(file).toLowerCase();
   const type = MIME[ext] || "application/octet-stream";
   const isHashed = /\/assets\/[^/]+-[A-Za-z0-9_-]{8}\./.test(file.replace(/\\/g, "/"));
+  const size = statSync(file).size;
+  const cache = isHashed ? "public, max-age=31536000, immutable" : "no-cache";
+
+  // Range 支持：大视频没有它就不能拖进度条，Safari 甚至可能拒绝播放。
+  const range = req.headers.range;
+  if (range && /^bytes=/.test(range)) {
+    const [startRaw, endRaw] = range.replace(/^bytes=/, "").split("-");
+    let start = Number(startRaw);
+    let end = endRaw ? Number(endRaw) : size - 1;
+    if (!Number.isFinite(start) || start < 0) start = 0;
+    if (!Number.isFinite(end) || end >= size) end = size - 1;
+    if (start > end || start >= size) {
+      res.writeHead(416, { "Content-Range": `bytes */${size}`, "Accept-Ranges": "bytes" });
+      res.end();
+      return;
+    }
+    res.writeHead(206, {
+      "Content-Type": type,
+      "Content-Range": `bytes ${start}-${end}/${size}`,
+      "Content-Length": end - start + 1,
+      "Accept-Ranges": "bytes",
+      "Cache-Control": cache,
+    });
+    createReadStream(file, { start, end }).pipe(res);
+    return;
+  }
 
   res.writeHead(200, {
     "Content-Type": type,
-    // 带哈希的产物长缓存，HTML 不缓存（否则部署后评委看到旧页面）
-    "Cache-Control": isHashed ? "public, max-age=31536000, immutable" : "no-cache",
+    "Content-Length": size,
+    "Accept-Ranges": "bytes",
+    "Cache-Control": cache,
   });
   createReadStream(file).pipe(res);
 }

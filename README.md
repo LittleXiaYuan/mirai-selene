@@ -9,9 +9,9 @@
 **输入一条热帖、一场谈判或一个还没拍板的决定，走进可回滚、可无损合流的平行叙事空间。**  
 *不是替人做决定，是让人在做决定之前，心里有数。*
 
-[![▶ 70 秒宣传片](assets/promo-preview.gif)](https://mirai.cloudtori.cn/promo/mirai-promo.mp4)
+[![▶ 70 秒宣传片](assets/promo-preview.gif)](https://mirai.cloudtori.cn/watch)
 
-<sub>点击画面看完整 70 秒（mp4，3.6 MB）· 不想看视频，往下有截图与实测</sub>
+<sub>点开自动播放（静音起播，一键开声音）· [直接打开原片 mp4](https://mirai.cloudtori.cn/promo/mirai-promo.mp4) · 不想看视频，往下有截图与实测</sub>
 
 [![Live Demo](https://img.shields.io/badge/Live_Demo-mirai.cloudtori.cn-6366f1?style=for-the-badge)](https://mirai.cloudtori.cn/)
 [![Engine Demo](https://img.shields.io/badge/ModelScope_Demo-PAI--SSM-0ea5e9?style=for-the-badge)](https://xiayuanovo-mirai-selene.ms.show/)
