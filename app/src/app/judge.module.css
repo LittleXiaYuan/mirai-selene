@@ -1,0 +1,93 @@
+/* 判断层：走完之后给的四条结论 */
+.judge {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.likely {
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-weight: 500;
+  line-height: 1.5;
+  letter-spacing: var(--tracking-display);
+  color: var(--foreground);
+  text-wrap: pretty;
+}
+
+.block {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.blockTitle {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+}
+
+.items {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.item {
+  display: flex;
+  gap: var(--space-2);
+  font-size: var(--text-sm);
+  line-height: var(--leading-body);
+  color: var(--text-secondary);
+}
+
+.item::before {
+  content: "·";
+  color: var(--text-muted);
+  flex: none;
+}
+
+/* 敏感性：改什么 → 会怎样 */
+.sens {
+  display: grid;
+  gap: var(--space-1) var(--space-3);
+  grid-template-columns: 1fr;
+  padding: var(--space-3);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-control);
+}
+
+@media (min-width: 560px) {
+  .sens {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr);
+    align-items: baseline;
+  }
+}
+
+.sensChange {
+  font-size: var(--text-sm);
+  color: var(--foreground);
+}
+
+.sensEffect {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  line-height: var(--leading-body);
+}
+
+.advice {
+  padding: var(--space-4);
+  border-radius: var(--radius-control);
+  background: var(--accent-subtle);
+  font-size: var(--text-sm);
+  line-height: var(--leading-body);
+  color: var(--foreground);
+}
+
+.loading {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}

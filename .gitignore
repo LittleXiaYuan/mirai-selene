@@ -1,0 +1,30 @@
+# 依赖与产物
+node_modules/
+dist/
+.vite/
+*.log
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# 运行时数据与权重
+data/
+runs/
+*.pt
+*.pth
+*.safetensors
+*.ckpt
+
+# 本地配置与密钥
+.env
+.env.*
+components.json
+
+# 系统与编辑器
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

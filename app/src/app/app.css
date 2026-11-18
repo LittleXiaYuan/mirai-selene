@@ -1,0 +1,235 @@
+/* --------------------------------------------------------------------------
+   Mirai-Selene
+   这一层只做两件事：挂上 Arc 的字体，定义几个本产品自己的语义别名。
+   颜色、间距、圆角、字号一律用 foundation.css 的 token，不写裸值。
+   -------------------------------------------------------------------------- */
+
+:root {
+  --mirai-page-max: 520px;
+  /* 手机底栏总高（含 iPhone 安全区）；各页用它留出底部内边距 */
+  --mirai-tabbar-h: calc(56px + env(safe-area-inset-bottom, 0px));
+  /* 遮罩色：从背景派生，深浅主题都成立 */
+  --scrim: color-mix(in oklab, var(--background) 74%, transparent);
+  /* foundation.css 用这两个名字找字体，fontsource 装的是 Variable 版本 */
+  --font-geist: "Geist Sans", "Geist Variable", system-ui, sans-serif;
+  --font-inter: "Inter Variable", "Inter", system-ui, sans-serif;
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  line-height: var(--leading-body);
+  letter-spacing: var(--tracking-body);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overscroll-behavior-y: none;
+}
+
+#root {
+  min-height: 100%;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+h1,
+h2,
+h3,
+h4,
+p,
+figure {
+  margin: 0;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  background: none;
+  border: 0;
+  padding: 0;
+}
+
+/* 选中文字用 accent 的底色，而不是浏览器默认的蓝 */
+::selection {
+  background: var(--accent-subtle);
+  color: var(--foreground);
+}
+
+/* 滚动条在深色下别是白的 */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: var(--radius-pill);
+  border: 3px solid transparent;
+  background-clip: padding-box;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+  background-clip: padding-box;
+  border: 3px solid transparent;
+}
+
+/* 页面容器：一个就够了，块不再套容器 */
+.page {
+  width: 100%;
+  max-width: var(--mirai-page-max);
+  margin: 0 auto;
+  padding-inline: var(--space-5);
+}
+
+/* 顶部栏：贴顶，滚动时不透明 */
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding-block: var(--space-3);
+  padding-inline: var(--space-5);
+  padding-top: calc(var(--space-3) + env(safe-area-inset-top, 0px));
+  background: var(--background);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.topbar-title {
+  flex: 1;
+  min-width: 0;
+}
+
+.topbar-title h1 {
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: 500;
+  line-height: var(--leading-display);
+  letter-spacing: var(--tracking-display);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.topbar-title p {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+}
+
+/* 图标按钮：44px 触摸目标，形状即控件 */
+.icon-button {
+  display: grid;
+  place-items: center;
+  width: var(--control-height-md);
+  height: var(--control-height-md);
+  flex: none;
+  border-radius: var(--radius-control);
+  color: var(--text-secondary);
+  transition: color var(--duration-fast) var(--ease-standard),
+    background-color var(--duration-fast) var(--ease-standard);
+}
+
+.icon-button:hover {
+  color: var(--foreground);
+  background: var(--surface-muted);
+}
+
+.icon-button:active {
+  transform: scale(0.97);
+  transition: transform var(--duration-spring) var(--ease-spring);
+}
+
+/* 页面区块节奏 */
+.section {
+  padding-block: var(--space-6);
+}
+
+.section + .section {
+  border-top: 1px solid var(--border-subtle);
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.stack-lg {
+  gap: var(--space-5);
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.spacer {
+  flex: 1;
+}
+
+/* 文本层级 */
+.display {
+  font-family: var(--font-display);
+  font-size: var(--text-2xl);
+  font-weight: 500;
+  line-height: var(--leading-display);
+  letter-spacing: var(--tracking-display);
+  text-wrap: balance;
+}
+
+.heading {
+  font-size: var(--text-base);
+  font-weight: 500;
+  letter-spacing: var(--tracking-body);
+}
+
+.body {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  line-height: var(--leading-body);
+  max-width: 68ch;
+}
+
+.muted {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+}
+
+.numeric {
+  font-variant-numeric: tabular-nums;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* iOS 在字号小于 16px 的输入框上会自动放大页面，所以表单控件统一 16px。
+   这是移动端适配，不改 Arc 组件的布局。 */
+.field-16.field-16 {
+  font-size: var(--text-base);
+}
+
+/* Arc 的分段控件默认 36px 高；手机上要 44px 才好点。
+   通过覆盖它的高度 token 实现，不去改组件内部样式。 */
+.segmented-touch {
+  --control-height-sm: var(--control-height-md);
+}

@@ -1,0 +1,229 @@
+/* 首页：一个世界一行，像书脊。不是卡片网格。 */
+.home {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+  max-width: var(--mirai-page-max);
+  margin: 0 auto;
+  padding: calc(var(--space-6) + env(safe-area-inset-top, 0px)) var(--space-5)
+    calc(var(--space-8) + env(safe-area-inset-bottom, 0px));
+  background: radial-gradient(
+    900px 620px at 28% 0%,
+    color-mix(in oklab, var(--background) 46%, transparent),
+    transparent 72%
+  );
+}
+
+.brandRow {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-bottom: var(--space-5);
+}
+
+.brand {
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: 500;
+  letter-spacing: var(--tracking-display);
+  color: var(--foreground);
+}
+
+.brand span {
+  color: var(--accent);
+}
+
+.account {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.syncDot {
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-pill);
+  background: var(--text-muted);
+  flex: none;
+}
+
+.syncDot[data-state="saving"] {
+  background: var(--accent);
+}
+
+.syncDot[data-state="saved"] {
+  background: var(--success);
+}
+
+.syncDot[data-state="error"] {
+  background: var(--danger);
+}
+
+.headline {
+  font-family: var(--font-display);
+  font-size: var(--text-2xl);
+  font-weight: 500;
+  line-height: var(--leading-display);
+  letter-spacing: var(--tracking-display);
+  color: var(--foreground);
+  text-wrap: balance;
+  margin-bottom: var(--space-6);
+  max-width: 16ch;
+}
+
+.samples {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-top: var(--space-6);
+}
+
+.samplesHead {
+  font-size: var(--text-xs);
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+}
+
+/* 世界条目：一行一个，靠分割线分组，不用卡片嵌套 */
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  border-top: 0;
+}
+
+.worldRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid color-mix(in oklab, var(--border) 58%, transparent);
+  border-radius: var(--radius-control);
+  background: color-mix(in oklab, var(--surface) 46%, transparent);
+  -webkit-backdrop-filter: blur(18px) saturate(1.15);
+  backdrop-filter: blur(18px) saturate(1.15);
+  box-shadow: var(--shadow-resting);
+  text-align: left;
+  transition:
+    background-color var(--duration-fast) var(--ease-standard),
+    border-color var(--duration-fast) var(--ease-standard);
+}
+
+.worldRow:hover {
+  background: color-mix(in oklab, var(--surface) 62%, transparent);
+  border-color: color-mix(in oklab, var(--border-strong) 45%, transparent);
+}
+
+.worldRow:active {
+  transform: scale(0.995);
+  transition: transform var(--duration-spring) var(--ease-spring);
+}
+
+.worldThumb {
+  width: var(--space-12);
+  height: var(--space-12);
+  flex: none;
+  border-radius: var(--radius-control);
+  object-fit: cover;
+  background: var(--surface-muted);
+}
+
+.worldText {
+  flex: 1;
+  min-width: 0;
+}
+
+.worldName {
+  display: block;
+  font-size: var(--text-base);
+  font-weight: 500;
+  color: var(--foreground);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.worldHook {
+  display: block;
+  margin-top: 2px;
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.worldMeta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* 底部动作区 */
+.actions {
+  margin-top: var(--space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.templates {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-control);
+  background: var(--surface-muted);
+}
+
+.templatesHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.templatesLabel {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+}
+
+.templateRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+}
+
+.secondaryRow {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.footNote {
+  margin-top: var(--space-5);
+  font-size: var(--text-xs);
+  line-height: 1.6;
+  color: var(--text-muted);
+  max-width: 42ch;
+}
+
+/* 手机底栏：内容给导航让出底部空间 */
+@media (max-width: 767px) {
+  .home {
+    padding-bottom: calc(var(--space-6) + var(--mirai-tabbar-h));
+  }
+}
+
+/* 顶部：已登录时的「工作台 / 退出」 */
+.accountActions {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+}

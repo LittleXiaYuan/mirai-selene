@@ -1,0 +1,521 @@
+.page {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: 18px clamp(12px, 2.5vw, 32px) 20px;
+  overflow: hidden;
+}
+
+.top {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex: none;
+  min-height: 36px;
+}
+
+.brand {
+  font-family: var(--font-display);
+  font-size: var(--text-base);
+  font-weight: 500;
+  letter-spacing: 0.06em;
+}
+
+.brand span {
+  color: var(--accent);
+}
+
+.spacer {
+  flex: 1;
+}
+
+.layout {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+  gap: var(--space-4);
+}
+
+.left,
+.right {
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  scrollbar-width: thin;
+  padding-right: 2px;
+}
+
+.kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.6875rem;
+  letter-spacing: 0.12em;
+  color: var(--text-muted);
+}
+
+.inputCard,
+.snapshot,
+.simCard,
+.intro {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-5);
+  border: 1px solid color-mix(in oklab, var(--border) 66%, transparent);
+  border-radius: var(--radius-panel);
+  background: color-mix(in oklab, var(--surface) 56%, transparent);
+  -webkit-backdrop-filter: blur(26px) saturate(1.2);
+  backdrop-filter: blur(26px) saturate(1.2);
+  box-shadow: var(--shadow-floating);
+}
+
+.inputHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.inputActions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.error {
+  font-size: var(--text-sm);
+  color: var(--danger);
+}
+
+.cases {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--border-subtle);
+}
+
+.caseLabel {
+  font-size: 0.6875rem;
+  color: var(--text-muted);
+}
+
+.caseRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.snapshotHead {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.snapshotMeta {
+  font-size: 0.6875rem;
+  color: var(--text-muted);
+}
+
+.snapshot h2 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--text-2xl);
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+.snapshot p {
+  margin: 0;
+  font-size: var(--text-sm);
+  line-height: 1.75;
+  color: var(--text-secondary);
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.tag {
+  padding: 2px 9px;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-pill);
+  font-size: 0.6875rem;
+  color: var(--text-muted);
+}
+
+.comments {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-top: var(--space-2);
+  border-top: 1px solid var(--border-subtle);
+}
+
+.comment {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+  font-size: var(--text-sm);
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+.comment b {
+  font-size: 0.6875rem;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.note {
+  font-size: 0.6875rem;
+  color: var(--text-muted);
+}
+
+.sectionHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.sectionHead h2 {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  font-size: var(--text-base);
+  font-weight: 600;
+}
+
+.sectionHead span {
+  font-size: 0.6875rem;
+  color: var(--text-muted);
+}
+
+.factions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.factionGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  gap: var(--space-2);
+}
+
+.faction {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border: 1px solid color-mix(in oklab, var(--border) 62%, transparent);
+  border-radius: var(--radius-control);
+  background: color-mix(in oklab, var(--surface) 52%, transparent);
+  text-align: left;
+  transition:
+    border-color var(--duration-fast) var(--ease-standard),
+    background-color var(--duration-fast) var(--ease-standard);
+}
+
+.faction:hover {
+  border-color: var(--border-strong);
+  background: color-mix(in oklab, var(--surface) 66%, transparent);
+}
+
+.faction[data-active] {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent);
+}
+
+.factionHead {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.factionName {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.factionName b {
+  font-size: var(--text-sm);
+  font-weight: 600;
+}
+
+.factionName span {
+  font-size: 0.6875rem;
+  color: var(--text-muted);
+}
+
+.claim {
+  margin: 0;
+  font-size: var(--text-sm);
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+.motive {
+  display: flex;
+  align-items: flex-start;
+  gap: 5px;
+  margin: 0;
+  padding: var(--space-2);
+  border-radius: 10px;
+  background: color-mix(in oklab, var(--warning) 10%, transparent);
+  font-size: 0.6875rem;
+  line-height: 1.6;
+  color: color-mix(in oklab, var(--warning) 75%, var(--foreground));
+}
+
+.motive svg {
+  flex: none;
+  margin-top: 2px;
+}
+
+.bias {
+  display: flex;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+  font-size: 0.6875rem;
+  color: var(--text-muted);
+}
+
+.bias b {
+  font-weight: 500;
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+.playAs {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: auto;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.simCard {
+  gap: var(--space-3);
+}
+
+.simActions {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.branches {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.branch {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: 7px 10px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 10px;
+  font-size: var(--text-xs);
+  color: var(--text-secondary);
+}
+
+.branch:hover {
+  border-color: var(--border-strong);
+}
+
+.branch b {
+  color: var(--danger);
+  font-variant-numeric: tabular-nums;
+}
+
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-2);
+}
+
+.metrics > div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: var(--space-3);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-control);
+  background: color-mix(in oklab, var(--surface) 50%, transparent);
+}
+
+.metrics span {
+  font-size: 0.6875rem;
+  color: var(--text-muted);
+}
+
+.metrics b {
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+.timeline {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.round {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.event {
+  display: flex;
+  gap: 10px;
+  padding: var(--space-2) 0;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.eventBody {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.eventHead {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.eventHead b {
+  font-size: var(--text-xs);
+  font-weight: 600;
+}
+
+.eventMeta {
+  font-size: 0.625rem;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.event p {
+  margin: 0;
+  font-size: var(--text-sm);
+  line-height: 1.65;
+  color: var(--text-secondary);
+}
+
+.intro {
+  min-height: 100%;
+  justify-content: center;
+}
+
+@media (max-width: 1000px) {
+  .layout {
+    grid-template-columns: minmax(0, 1fr);
+    /* 单列时行高必须跟着内容走，否则两行会被压成容器高度、左右栏叠在一起 */
+    grid-auto-rows: max-content;
+    align-content: start;
+    overflow-y: auto;
+  }
+
+  .left,
+  .right {
+    overflow: visible;
+  }
+}
+
+@media (max-width: 640px) {
+  .page {
+    padding: 10px 10px calc(10px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .inputCard,
+  .snapshot,
+  .simCard {
+    padding: var(--space-4);
+  }
+
+  .factionGrid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.history {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-3);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-control);
+  background: color-mix(in oklab, var(--surface) 46%, transparent);
+}
+
+.run {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 6px 4px;
+  border-radius: 8px;
+  text-align: left;
+  font-size: var(--text-xs);
+  color: var(--text-secondary);
+}
+
+.run:hover {
+  background: var(--surface-muted);
+}
+
+.run span {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.run small {
+  flex: none;
+  color: var(--text-muted);
+  font-size: 0.625rem;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 767px) {
+  /* 固定定位的页面用缩底而不是内边距，内部滚动区才会停在底栏上方 */
+  .page {
+    bottom: var(--mirai-tabbar-h);
+  }
+
+  /* 单列时空态不必撑满一屏，否则会被底栏切掉半句话 */
+  .intro {
+    min-height: 0;
+    justify-content: flex-start;
+  }
+}

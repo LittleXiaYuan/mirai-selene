@@ -1,0 +1,92 @@
+/* 聚焦引导：页面整体压暗，只有目标元素透出来，说明贴在它旁边 */
+.layer {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+}
+
+/* 这个洞不需要背景色：它的巨大外阴影把周围全部压暗，只有洞内是透明的 */
+.hole {
+  position: fixed;
+  border-radius: var(--radius-control);
+  box-shadow: 0 0 0 9999px var(--scrim);
+  pointer-events: none;
+  transition: top var(--duration-standard) var(--ease-standard),
+    left var(--duration-standard) var(--ease-standard),
+    width var(--duration-standard) var(--ease-standard),
+    height var(--duration-standard) var(--ease-standard);
+}
+
+/* 拦截点击，避免误触到被高亮的控件 */
+.catch {
+  position: absolute;
+  inset: 0;
+  background: transparent;
+}
+
+.card {
+  position: fixed;
+  width: min(22rem, calc(100vw - var(--space-8)));
+  padding: var(--space-4);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-panel);
+  background: var(--surface-raised);
+  box-shadow: var(--shadow-floating);
+}
+
+.head {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  margin-bottom: var(--space-2);
+}
+
+.step {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+  flex: none;
+}
+
+.title {
+  font-size: var(--text-base);
+  font-weight: 500;
+  color: var(--foreground);
+}
+
+.body {
+  font-size: var(--text-sm);
+  line-height: var(--leading-body);
+  color: var(--text-secondary);
+  margin-bottom: var(--space-4);
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.dots {
+  display: flex;
+  gap: 6px;
+  margin-right: auto;
+}
+
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-pill);
+  background: var(--border-strong);
+  transition: background-color var(--duration-fast) var(--ease-standard);
+}
+
+.dot[data-on="true"] {
+  background: var(--accent);
+}
+
+/* 目标元素在高亮期间抬到遮罩之上 */
+:global([data-tour-active="true"]) {
+  position: relative;
+  z-index: 81;
+}

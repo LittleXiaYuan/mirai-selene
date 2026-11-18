@@ -1,0 +1,62 @@
+/* 手机端底栏：55px 内容 + 安全区。桌面隐藏，不参与布局。 */
+
+.bar {
+  display: none;
+  position: fixed;
+  z-index: 40;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 4px;
+  padding: 5px 8px calc(5px + env(safe-area-inset-bottom, 0px));
+  border-top: 1px solid color-mix(in oklab, var(--border) 70%, transparent);
+  background: color-mix(in oklab, var(--background) 90%, transparent);
+  -webkit-backdrop-filter: blur(20px) saturate(1.2);
+  backdrop-filter: blur(20px) saturate(1.2);
+}
+
+.item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  min-height: 46px;
+  padding: 4px 2px;
+  border: 0;
+  border-radius: var(--radius-control);
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 0.6875rem;
+  line-height: 1.2;
+  transition: color 160ms var(--ease-standard, ease);
+}
+
+.item svg {
+  color: inherit;
+}
+
+.item[aria-current="page"] {
+  color: var(--foreground);
+}
+
+.bar[data-covered] {
+  display: none;
+}
+
+.item[aria-current="page"] svg {
+  color: var(--accent);
+}
+
+@media (max-width: 767px) {
+  .bar {
+    display: grid;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .item {
+    transition: none;
+  }
+}

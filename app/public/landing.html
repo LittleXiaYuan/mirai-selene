@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="dark" data-accent="violet">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mirai-Selene · 可拥有的平行世界引擎</title>
+    <style>
+      :root { color-scheme: dark; }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        min-height: 100dvh;
+        display: grid;
+        place-items: center;
+        background:
+          radial-gradient(900px 600px at 70% 15%, rgba(120, 110, 255, .20), transparent 60%),
+          radial-gradient(700px 500px at 15% 80%, rgba(80, 200, 220, .10), transparent 55%),
+          #05070f;
+        color: #e8ecff;
+        font-family: "Inter", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+      }
+      main { width: min(880px, calc(100% - 48px)); padding: 48px 0; }
+      .kicker { margin: 0 0 18px; color: #8b93b8; font-size: 12px; letter-spacing: .28em; }
+      h1 {
+        margin: 0;
+        font-family: "Songti SC", "Noto Serif SC", serif;
+        font-size: clamp(34px, 6vw, 64px);
+        line-height: 1.15;
+        font-weight: 500;
+        letter-spacing: .01em;
+      }
+      h1 span { background: linear-gradient(90deg, #fff, #c9d5ff 55%, #c9a7ff); -webkit-background-clip: text; background-clip: text; color: transparent; }
+      .sub { margin: 22px 0 0; color: #b9c2e6; font-size: 16px; line-height: 1.8; max-width: 620px; }
+      .links { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 36px; }
+      .links a {
+        display: inline-flex; align-items: center; gap: 8px;
+        padding: 12px 20px; border-radius: 12px; border: 1px solid rgba(255,255,255,.16);
+        background: rgba(255,255,255,.05); color: #e8ecff; text-decoration: none; font-size: 14px;
+        transition: background-color .18s ease, border-color .18s ease;
+      }
+      .links a:hover { background: rgba(255,255,255,.10); border-color: rgba(169,192,255,.5); }
+      .links a.primary { background: rgba(157,183,255,.18); border-color: rgba(157,183,255,.5); }
+      .note { margin: 28px 0 0; color: #6a7398; font-size: 12px; line-height: 1.7; }
+      .moon {
+        width: 56px; height: 56px; border-radius: 50%;
+        background: radial-gradient(circle at 35% 30%, #fff 0 16%, #e6ebff 28%, #b7c6ff 55%, #4a4f86 100%);
+        box-shadow: 0 0 40px rgba(157,183,255,.45);
+        margin-bottom: 26px;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <div class="moon"></div>
+      <p class="kicker">MIRAI · SELENE</p>
+      <h1><span>预测万物，<br />不如走进一个世界。</span></h1>
+      <p class="sub">一个可拥有的平行世界引擎。Studio 造世界，Stage 走进去，World File 是资产。每个世界都可以保存、分支、合并、回滚、审计。</p>
+      <div class="links">
+        <a class="primary" href="/">进入 App</a>
+        <a href="/mirai-studio.html">旧版 Studio</a>
+      </div>
+      <p class="note">Prototype · 真实 LLM 需要启动本地代理（见 README）</p>
+    </main>
+  </body>
+</html>

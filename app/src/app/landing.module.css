@@ -1,0 +1,393 @@
+/* 宣传落地页：先讲清是什么，再给两个动作。 */
+
+.page {
+  min-height: 100dvh;
+  background:
+    radial-gradient(1200px 720px at 74% -8%, color-mix(in oklab, var(--accent) 16%, transparent), transparent 62%),
+    radial-gradient(900px 600px at 8% 12%, color-mix(in oklab, var(--accent) 8%, transparent), transparent 58%),
+    var(--background);
+  color: var(--foreground);
+  padding-bottom: calc(var(--space-8) + env(safe-area-inset-bottom, 0px));
+}
+
+.nav {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: calc(var(--space-3) + env(safe-area-inset-top, 0px)) var(--space-5);
+  background: color-mix(in oklab, var(--background) 78%, transparent);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid color-mix(in oklab, var(--border) 55%, transparent);
+}
+
+.brand {
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  letter-spacing: var(--tracking-display);
+  color: var(--foreground);
+  text-decoration: none;
+  flex: none;
+}
+
+.brand span {
+  color: var(--accent);
+}
+
+.navLinks {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-left: var(--space-4);
+}
+
+.navLinks a,
+.navLinks button {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  text-decoration: none;
+  background: none;
+  border: 0;
+  padding: 4px 2px;
+  cursor: pointer;
+  transition: color var(--duration-fast) var(--ease-standard);
+}
+
+.navLinks a:hover,
+.navLinks button:hover {
+  color: var(--foreground);
+}
+
+.navActions {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.main {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--space-8) * 1.1);
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: var(--space-7) var(--space-5) 0;
+}
+
+.hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+  gap: var(--space-7);
+  align-items: center;
+}
+
+.eyebrow {
+  display: inline-block;
+  font-size: var(--text-xs);
+  letter-spacing: 0.14em;
+  color: var(--text-muted);
+  margin-bottom: var(--space-3);
+}
+
+.hero h1 {
+  font-family: var(--font-display);
+  font-size: clamp(2.1rem, 5vw, 3.4rem);
+  font-weight: 500;
+  line-height: 1.16;
+  letter-spacing: var(--tracking-display);
+  margin: 0 0 var(--space-4);
+  text-wrap: balance;
+}
+
+.lead {
+  font-size: var(--text-md);
+  line-height: var(--leading-relaxed);
+  color: var(--text-secondary);
+  max-width: 34rem;
+  margin: 0 0 var(--space-5);
+}
+
+.heroActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+.stats {
+  display: flex;
+  gap: var(--space-6);
+  margin: var(--space-6) 0 0;
+  padding-top: var(--space-4);
+  border-top: 1px solid color-mix(in oklab, var(--border) 50%, transparent);
+}
+
+.stats div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.stats dt {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+}
+
+.stats dd {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-variant-numeric: tabular-nums;
+}
+
+.heroArt {
+  position: relative;
+  border-radius: var(--radius-panel);
+  overflow: hidden;
+  border: 1px solid color-mix(in oklab, var(--border) 60%, transparent);
+  box-shadow: var(--shadow-floating);
+  aspect-ratio: 4 / 3;
+}
+
+.heroArt img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.heroCard {
+  position: absolute;
+  left: var(--space-4);
+  right: var(--space-4);
+  bottom: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-control);
+  background: color-mix(in oklab, var(--surface-raised) 82%, transparent);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  border: 1px solid color-mix(in oklab, var(--border) 65%, transparent);
+  font-size: var(--text-sm);
+}
+
+.heroCard span {
+  color: var(--text-muted);
+  font-size: var(--text-xs);
+}
+
+.heroCard em {
+  color: var(--text-secondary);
+  font-style: normal;
+  font-size: var(--text-xs);
+}
+
+.capabilities h2,
+.showcase h2,
+.engine h2,
+.cta h2 {
+  font-family: var(--font-display);
+  font-size: clamp(1.4rem, 3vw, 2rem);
+  font-weight: 500;
+  letter-spacing: var(--tracking-display);
+  margin: 0 0 var(--space-5);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-4);
+}
+
+.grid article {
+  padding: var(--space-5);
+  border-radius: var(--radius-panel);
+  border: 1px solid color-mix(in oklab, var(--border) 58%, transparent);
+  background: color-mix(in oklab, var(--surface) 52%, transparent);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+}
+
+.grid h3 {
+  margin: var(--space-3) 0 var(--space-2);
+  font-size: var(--text-md);
+  font-weight: 500;
+}
+
+.grid p {
+  margin: 0;
+  font-size: var(--text-sm);
+  line-height: var(--leading-relaxed);
+  color: var(--text-secondary);
+}
+
+.screens {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-4);
+}
+
+.screens figure {
+  margin: 0;
+  border-radius: var(--radius-panel);
+  overflow: hidden;
+  border: 1px solid color-mix(in oklab, var(--border) 58%, transparent);
+  background: var(--surface);
+}
+
+.screens img {
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+  display: block;
+}
+
+.screens figcaption {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+}
+
+.engine {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+  gap: var(--space-7);
+  align-items: center;
+  padding: var(--space-7);
+  border-radius: var(--radius-panel);
+  border: 1px solid color-mix(in oklab, var(--border) 60%, transparent);
+  background: color-mix(in oklab, var(--surface) 58%, transparent);
+}
+
+.engine p {
+  color: var(--text-secondary);
+  line-height: var(--leading-relaxed);
+  margin: 0 0 var(--space-4);
+}
+
+.engine ul {
+  margin: 0 0 var(--space-5);
+  padding-left: 1.1em;
+  color: var(--text-secondary);
+  line-height: var(--leading-relaxed);
+  font-size: var(--text-sm);
+}
+
+.engineArt {
+  border-radius: var(--radius-control);
+  overflow: hidden;
+  border: 1px solid color-mix(in oklab, var(--border) 55%, transparent);
+}
+
+.engineArt img {
+  width: 100%;
+  display: block;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+}
+
+.cta {
+  text-align: center;
+  padding: var(--space-7) var(--space-5);
+  border-radius: var(--radius-panel);
+  border: 1px solid color-mix(in oklab, var(--border) 55%, transparent);
+  background:
+    radial-gradient(600px 240px at 50% 0%, color-mix(in oklab, var(--accent) 14%, transparent), transparent 70%),
+    color-mix(in oklab, var(--surface) 46%, transparent);
+}
+
+.cta p {
+  color: var(--text-secondary);
+  margin: 0 auto var(--space-5);
+  max-width: 40rem;
+  line-height: var(--leading-relaxed);
+}
+
+.cta .heroActions {
+  justify-content: center;
+}
+
+.footer {
+  max-width: 1180px;
+  margin: var(--space-7) auto 0;
+  padding: var(--space-5);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  border-top: 1px solid color-mix(in oklab, var(--border) 50%, transparent);
+  color: var(--text-muted);
+  font-size: var(--text-xs);
+}
+
+.footerLinks {
+  display: flex;
+  gap: var(--space-3);
+}
+
+.footerLinks a,
+.footerLinks button {
+  color: var(--text-muted);
+  background: none;
+  border: 0;
+  cursor: pointer;
+  font: inherit;
+}
+
+.footerLinks a:hover,
+.footerLinks button:hover {
+  color: var(--foreground);
+}
+
+@media (max-width: 1023px) {
+  .hero,
+  .engine {
+    grid-template-columns: 1fr;
+  }
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .screens {
+    grid-template-columns: 1fr;
+  }
+  .heroArt {
+    aspect-ratio: 16 / 10;
+  }
+}
+
+@media (max-width: 767px) {
+  .nav {
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+  .navLinks {
+    order: 3;
+    width: 100%;
+    margin-left: 0;
+    justify-content: space-between;
+  }
+  .main {
+    padding-top: var(--space-5);
+    gap: var(--space-7);
+  }
+  .grid {
+    grid-template-columns: 1fr;
+  }
+  .stats {
+    gap: var(--space-4);
+  }
+  .engine {
+    padding: var(--space-5);
+  }
+  .footer {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

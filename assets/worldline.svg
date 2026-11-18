@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 520" width="1200" height="520" role="img" aria-label="世界线分叉与合流示意">
+  <defs>
+    <linearGradient id="bg2" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0c0e16"/>
+      <stop offset="1" stop-color="#080910"/>
+    </linearGradient>
+    <marker id="a2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#5b6478"/>
+    </marker>
+    <style>
+      .t2 { font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif; fill:#e8ecff; }
+      .s2 { font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif; fill:#98a1bb; }
+      .m2 { font-family: ui-monospace, Consolas, monospace; fill:#a9c6ff; }
+      .l2 { stroke:#4a5268; stroke-width:1.6; fill:none; }
+      .dead { stroke:#7a3b48; stroke-width:1.6; fill:none; stroke-dasharray:5 5; }
+      .live { stroke:#3f8f84; stroke-width:1.8; fill:none; }
+    </style>
+  </defs>
+
+  <rect width="1200" height="520" fill="url(#bg2)"/>
+  <text x="44" y="52" class="t2" font-size="22" font-weight="600">世界线：试错、回滚、无损合流</text>
+  <text x="44" y="78" class="s2" font-size="13">分支只写增量；合流是自然参数的加法，不是让模型重新编一遍</text>
+
+  <!-- root -->
+  <circle cx="110" cy="260" r="10" fill="#8b7dff"/>
+  <text x="128" y="256" class="t2" font-size="14">起点</text>
+  <text x="128" y="276" class="s2" font-size="12">世界共识 / 初始底牌</text>
+
+  <!-- branches -->
+  <path d="M120 260 C 220 200, 280 170, 380 170" class="live"/>
+  <path d="M120 260 C 220 260, 280 260, 380 260" class="l2"/>
+  <path d="M120 260 C 220 320, 280 350, 380 350" class="dead"/>
+
+  <circle cx="390" cy="170" r="9" fill="#3f8f84"/>
+  <text x="410" y="166" class="t2" font-size="13">A · 拿期权换分期</text>
+  <text x="410" y="186" class="s2" font-size="12">探到底牌：她怕尾款没人兜底</text>
+
+  <circle cx="390" cy="260" r="9" fill="#6b7280"/>
+  <text x="410" y="256" class="t2" font-size="13">B · 先稳住套话</text>
+  <text x="410" y="276" class="s2" font-size="12">试探性追问，信息量中等</text>
+
+  <circle cx="390" cy="350" r="9" fill="#7a3b48"/>
+  <text x="410" y="346" class="t2" font-size="13">C · 直接摊牌硬刚</text>
+  <text x="410" y="366" class="s2" font-size="12">击穿死穴：谈崩出局（墓碑）</text>
+
+  <!-- continue -->
+  <path d="M400 170 C 520 170, 560 205, 660 210" class="live"/>
+  <path d="M400 260 C 520 260, 560 230, 660 230" class="live"/>
+  <path d="M400 350 C 520 350, 560 300, 660 250" class="dead"/>
+
+  <!-- merge -->
+  <rect x="672" y="188" width="196" height="86" rx="14" fill="#12151f" stroke="#3b4270"/>
+  <text x="694" y="218" class="t2" font-size="14" font-weight="600">merge3 合流</text>
+  <text x="694" y="242" class="m2" font-size="12">A = A_a + A_b − A_base</text>
+  <text x="694" y="262" class="s2" font-size="11.5">交换律 · 幂等 · 2.12e-16</text>
+
+  <!-- output -->
+  <path d="M868 231 C 930 231, 960 231, 1010 231" stroke="#5b6478" stroke-width="1.4" fill="none" marker-end="url(#a2)"/>
+  <rect x="1018" y="188" width="148" height="86" rx="14" fill="#0f2a27" stroke="#3f8f84"/>
+  <text x="1038" y="218" class="t2" font-size="14" font-weight="600">破局线</text>
+  <text x="1038" y="242" class="s2" font-size="12">合并两半底牌</text>
+  <text x="1038" y="262" class="s2" font-size="12">生成决策卡</text>
+
+  <!-- legend -->
+  <line x1="44" y1="424" x2="84" y2="424" class="live"/>
+  <text x="92" y="429" class="s2" font-size="12">存活 / 有情报的线</text>
+  <line x1="244" y1="424" x2="284" y2="424" class="dead"/>
+  <text x="292" y="429" class="s2" font-size="12">翻脸死局（留墓碑，不参与合流）</text>
+
+  <text x="44" y="474" class="s2" font-size="12.5">回滚只移动游标，不写新节点；所以同一状态永远回到同一帧。</text>
+</svg>

@@ -1,0 +1,53 @@
+.wrap {
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  padding: calc(var(--space-6) + env(safe-area-inset-top, 0px)) var(--space-4)
+    calc(var(--space-6) + env(safe-area-inset-bottom, 0px));
+  background:
+    radial-gradient(900px 560px at 50% 0%, color-mix(in oklab, var(--accent) 14%, transparent), transparent 66%),
+    var(--background);
+}
+
+.card {
+  width: min(28rem, 100%);
+  padding: var(--space-6);
+  border-radius: var(--radius-panel);
+  border: 1px solid color-mix(in oklab, var(--border) 60%, transparent);
+  background: color-mix(in oklab, var(--surface) 62%, transparent);
+  -webkit-backdrop-filter: blur(18px) saturate(1.1);
+  backdrop-filter: blur(18px) saturate(1.1);
+  box-shadow: var(--shadow-floating);
+}
+
+.back {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: var(--space-4);
+  background: none;
+  border: 0;
+  padding: 0;
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.back:hover {
+  color: var(--foreground);
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-weight: 500;
+  letter-spacing: var(--tracking-display);
+  margin: 0 0 var(--space-2);
+}
+
+.lead {
+  margin: 0 0 var(--space-5);
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+  line-height: var(--leading-relaxed);
+}

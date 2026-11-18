@@ -1,0 +1,141 @@
+/* 并行世界线面板：同时看好几个未来的样子 */
+.lanes {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-5) var(--space-2);
+}
+
+.laneList {
+  display: flex;
+  gap: var(--space-2);
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding-bottom: var(--space-1);
+}
+
+.laneList::-webkit-scrollbar {
+  display: none;
+}
+
+.lane {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex: none;
+  min-height: var(--control-height-md);
+  padding: 0 var(--space-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-control);
+  background: var(--surface);
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+  transition: border-color var(--duration-fast) var(--ease-standard),
+    color var(--duration-fast) var(--ease-standard);
+}
+
+.lane[data-active="true"] {
+  border-color: var(--accent);
+  color: var(--foreground);
+}
+
+.laneCount {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.laneAdd {
+  display: grid;
+  place-items: center;
+  width: var(--control-height-md);
+  height: var(--control-height-md);
+  flex: none;
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius-control);
+  color: var(--text-muted);
+  background: transparent;
+}
+
+.laneAdd:hover {
+  color: var(--foreground);
+  border-color: var(--accent);
+}
+
+/* 自动推演 */
+.autoRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.autoBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  min-height: var(--control-height-md);
+  padding: 0 var(--space-4);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+  transition: color var(--duration-fast) var(--ease-standard),
+    border-color var(--duration-fast) var(--ease-standard);
+}
+
+.autoBtn:hover {
+  color: var(--foreground);
+  border-color: var(--accent);
+}
+
+.autoBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.autoProgress {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* 合并预演 */
+.preview {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.previewItem {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-3);
+  padding: var(--space-2) 0;
+  border-bottom: 1px solid var(--border-subtle);
+  font-size: var(--text-sm);
+}
+
+.previewItem:last-child {
+  border-bottom: 0;
+}
+
+.previewKey {
+  flex: none;
+  min-width: 5rem;
+  color: var(--foreground);
+}
+
+.previewCalc {
+  flex: 1;
+  min-width: 0;
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+.previewBadge {
+  flex: none;
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+}

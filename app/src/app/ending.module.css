@@ -1,0 +1,154 @@
+/* 结束页：一屏把整段旅程收拢起来。像书最后一页，不是弹窗。 */
+.wrap {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+  max-width: var(--mirai-page-max);
+  margin: 0 auto;
+  padding: calc(var(--space-8) + env(safe-area-inset-top, 0px)) var(--space-5)
+    calc(var(--space-8) + env(safe-area-inset-bottom, 0px));
+}
+
+.eyebrowless {
+  font-family: var(--font-display);
+  font-size: var(--text-2xl);
+  font-weight: 500;
+  line-height: var(--leading-display);
+  letter-spacing: var(--tracking-display);
+  text-wrap: balance;
+  margin-bottom: var(--space-3);
+}
+
+.text {
+  font-size: var(--text-sm);
+  line-height: 1.75;
+  color: var(--text-secondary);
+  margin-bottom: var(--space-5);
+  max-width: 46ch;
+}
+
+.block {
+  padding-top: var(--space-5);
+  border-top: 1px solid var(--border-subtle);
+  margin-top: var(--space-5);
+}
+
+.blockTitle {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  margin-bottom: var(--space-3);
+}
+
+.memRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) 0;
+}
+
+.memKey {
+  flex: 1;
+  min-width: 0;
+  font-size: var(--text-sm);
+  color: var(--foreground);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.memBar {
+  flex: none;
+  width: 5rem;
+  height: 4px;
+  border-radius: var(--radius-pill);
+  background: var(--surface-muted);
+  overflow: hidden;
+}
+
+.memFill {
+  height: 100%;
+  border-radius: var(--radius-pill);
+  background: var(--accent);
+}
+
+.memValue {
+  flex: none;
+  width: 2rem;
+  text-align: right;
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* 走过的路：横排的节点，不用竖线 */
+.trail {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.trailItem {
+  padding: var(--space-1) var(--space-3);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-pill);
+  font-size: var(--text-xs);
+  color: var(--text-secondary);
+}
+
+.stats {
+  display: flex;
+  gap: var(--space-5);
+  margin-top: var(--space-4);
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.statValue {
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-weight: 500;
+  color: var(--foreground);
+  font-variant-numeric: tabular-nums;
+}
+
+.statLabel {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-top: var(--space-8);
+}
+
+@media (min-width: 1024px) {
+  .wrap {
+    max-width: 40rem;
+    padding-top: calc(var(--space-12) + env(safe-area-inset-top, 0px));
+  }
+
+  .eyebrowless {
+    font-size: var(--text-3xl);
+  }
+}
+
+.moodLine {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  font-size: var(--text-sm);
+  line-height: 1.7;
+  color: var(--text-secondary);
+}
+
+.moodNums {
+  font-variant-numeric: tabular-nums;
+  color: var(--text-muted);
+}
+
