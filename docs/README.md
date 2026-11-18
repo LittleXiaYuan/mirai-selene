@@ -11,6 +11,7 @@
 | [`WORLD-SPEC.md`](WORLD-SPEC.md) | World-Spec 协议：世界、阵营、资产与渲染契约 |
 | [`POSITIONING.md`](POSITIONING.md) | 产品立意与边界 |
 | [`NARRATIVE.md`](NARRATIVE.md) | 叙事主线与 slogan |
+| [`OPEN_CORE_CHECKLIST.md`](OPEN_CORE_CHECKLIST.md) | Open-Core 发布边界与检查清单 |
 | [`../WEIGHTS.md`](../WEIGHTS.md) | 权重与美术素材的授权边界 |
 
 ## 约定
