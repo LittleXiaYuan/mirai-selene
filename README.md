@@ -14,6 +14,8 @@
 [![MCP Tools](https://img.shields.io/badge/MCP_Tools-12_Online_(17/17_Pass)-10b981?style=for-the-badge)](#-mcp-12-工具动作空间商汤小浣熊直连)
 [![Tests](https://img.shields.io/badge/Engine_Tests-76/76_Passed-22c55e?style=for-the-badge)](#-可复现性能基准)
 [![License](https://img.shields.io/badge/Distribution-Open--Core_Showcase-f59e0b?style=for-the-badge)](#-open-core-开源边界说明)
+[![GitHub](https://img.shields.io/badge/GitHub-LittleXiaYuan%2Fmirai--selene-181717?style=for-the-badge&logo=github)](https://github.com/LittleXiaYuan/mirai-selene)
+[![GitCode](https://img.shields.io/badge/GitCode-XiaYuanOwO%2Fmirai--selene-C9282D?style=for-the-badge)](https://gitcode.com/XiaYuanOwO/mirai-selene)
 
 </div>
 
