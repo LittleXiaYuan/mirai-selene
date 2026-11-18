@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 480" width="1200" height="480" role="img" aria-label="世界线分叉与合流">
+  <rect width="1200" height="480" fill="#0a0c13"/>
+  <g font-family="PingFang SC, Microsoft YaHei, system-ui, sans-serif">
+    <text x="52" y="56" fill="#e9edff" font-size="20" font-weight="600">分叉、回滚、无损合流</text>
+    <text x="52" y="82" fill="#8d96b2" font-size="12.5">分支只写增量；谈崩的分支留墓碑，不参与合流。</text>
+
+    <circle cx="104" cy="238" r="7" fill="#8b7dff"/>
+    <text x="122" y="234" fill="#e9edff" font-size="13.5">起点</text>
+    <text x="122" y="254" fill="#8d96b2" font-size="11.5">双方初始底牌</text>
+
+    <path d="M112 238 C 210 180, 270 156, 370 156" stroke="#3f8f84" stroke-width="1.6" fill="none"/>
+    <path d="M112 238 C 210 238, 270 238, 370 238" stroke="#4b5570" stroke-width="1.4" fill="none"/>
+    <path d="M112 238 C 210 296, 270 320, 370 320" stroke="#7a3b48" stroke-width="1.4" fill="none" stroke-dasharray="5 5"/>
+
+    <circle cx="378" cy="156" r="6" fill="#3f8f84"/>
+    <text x="396" y="152" fill="#e9edff" font-size="13">拿期权换分期</text>
+    <text x="396" y="172" fill="#8d96b2" font-size="11.5">探到底牌：她怕尾款没人兜底</text>
+
+    <circle cx="378" cy="238" r="6" fill="#6b7280"/>
+    <text x="396" y="234" fill="#e9edff" font-size="13">先稳住套话</text>
+    <text x="396" y="254" fill="#8d96b2" font-size="11.5">信息量中等，但安全</text>
+
+    <circle cx="378" cy="320" r="6" fill="#7a3b48"/>
+    <text x="396" y="316" fill="#e9edff" font-size="13">直接摊牌硬刚</text>
+    <text x="396" y="336" fill="#8d96b2" font-size="11.5">击穿死穴：谈崩出局</text>
+
+    <path d="M390 156 C 500 156, 540 190, 636 196" stroke="#3f8f84" stroke-width="1.6" fill="none"/>
+    <path d="M390 238 C 500 238, 540 214, 636 214" stroke="#3f8f84" stroke-width="1.6" fill="none"/>
+
+    <rect x="648" y="174" width="208" height="86" rx="10" fill="#0f1422" stroke="#39406a"/>
+    <text x="668" y="204" fill="#e9edff" font-size="14" font-weight="600">merge3</text>
+    <text x="668" y="228" fill="#a9c6ff" font-size="12" font-family="Consolas, monospace">A = A_a + A_b − A_base</text>
+    <text x="668" y="248" fill="#8d96b2" font-size="11.5">交换律 · 幂等 · 2.12e-16</text>
+
+    <path d="M856 216 H 960" stroke="#4b5570" stroke-width="1.2" fill="none"/>
+    <path d="M960 216 l-7 -3.5 v7 z" fill="#4b5570"/>
+    <text x="976" y="204" fill="#e9edff" font-size="13.5">破局线</text>
+    <text x="976" y="224" fill="#8d96b2" font-size="11.5">两半底牌合流</text>
+    <text x="976" y="244" fill="#8d96b2" font-size="11.5">生成决策卡</text>
+
+    <line x1="52" y1="392" x2="1148" y2="392" stroke="#232a3d"/>
+    <text x="52" y="424" fill="#6f7a96" font-size="12">回滚只移动游标，不写新节点；所以同一状态永远回到同一帧。</text>
+  </g>
+</svg>

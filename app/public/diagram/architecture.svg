@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 520" width="1200" height="520" role="img" aria-label="PAI-SSM 状态推演管线">
+  <rect width="1200" height="520" fill="#0a0c13"/>
+  <g font-family="PingFang SC, Microsoft YaHei, system-ui, sans-serif">
+    <text x="56" y="64" fill="#e9edff" font-size="22" font-weight="600">PAI-SSM · 状态推演管线</text>
+    <text x="56" y="90" fill="#8d96b2" font-size="13">语音与文本进入，状态核更新，分位数与红线输出</text>
+
+    <line x1="56" y1="120" x2="1144" y2="120" stroke="#232a3d"/>
+
+    <!-- 01 -->
+    <text x="56" y="164" fill="#6f7a96" font-size="12" letter-spacing="1.5">输入</text>
+    <text x="56" y="200" fill="#e9edff" font-size="16" font-weight="600">原始波形 / 文本</text>
+    <text x="56" y="226" fill="#8d96b2" font-size="12.5">不做 ASR 转写</text>
+    <text x="56" y="246" fill="#8d96b2" font-size="12.5">保留停顿与语气</text>
+
+    <!-- 02 -->
+    <text x="300" y="164" fill="#6f7a96" font-size="12" letter-spacing="1.5">韵律</text>
+    <text x="300" y="200" fill="#e9edff" font-size="16" font-weight="600">12 维声学特征</text>
+    <text x="300" y="226" fill="#8d96b2" font-size="12.5">犹豫 / 卡壳 / 填充音</text>
+    <text x="300" y="246" fill="#8d96b2" font-size="12.5">句末音高 · 声带微颤</text>
+
+    <!-- 03 core -->
+    <rect x="540" y="150" width="240" height="150" rx="10" fill="#0f1422" stroke="#39406a"/>
+    <text x="560" y="178" fill="#e9edff" font-size="15" font-weight="600">信息滤波状态核</text>
+    <text x="560" y="208" fill="#a9c6ff" font-size="12" font-family="Consolas, monospace">A = λI + Σ γ k kᵀ</text>
+    <text x="560" y="230" fill="#a9c6ff" font-size="12" font-family="Consolas, monospace">B = Σ γ v kᵀ</text>
+    <text x="560" y="252" fill="#a9c6ff" font-size="12" font-family="Consolas, monospace">W = B A⁻¹</text>
+    <text x="560" y="280" fill="#8d96b2" font-size="11.5">γ 由言行不一致度调制</text>
+
+    <!-- 04 -->
+    <text x="836" y="164" fill="#6f7a96" font-size="12" letter-spacing="1.5">决策</text>
+    <text x="836" y="200" fill="#e9edff" font-size="16" font-weight="600">六档姿态 · 主动追问</text>
+    <text x="836" y="226" fill="#8d96b2" font-size="12.5">EIG 找盲区，不问废话</text>
+    <text x="836" y="246" fill="#8d96b2" font-size="12.5">五档生死分位数 + P(ruin)</text>
+
+    <!-- arrows -->
+    <g stroke="#4b5570" stroke-width="1.2" fill="none">
+      <path d="M212 222 H286"/><path d="M494 222 H528"/><path d="M792 222 H824"/>
+    </g>
+    <g fill="#4b5570">
+      <path d="M286 222 l-7 -3.5 v7 z"/><path d="M528 222 l-7 -3.5 v7 z"/><path d="M824 222 l-7 -3.5 v7 z"/>
+    </g>
+
+    <!-- bottom -->
+    <line x1="56" y1="356" x2="1144" y2="356" stroke="#232a3d"/>
+    <text x="56" y="396" fill="#e9edff" font-size="15" font-weight="600">合流是加法，不是重新生成</text>
+    <text x="56" y="426" fill="#a9c6ff" font-size="14" font-family="Consolas, monospace">S_out = S_a + S_b − S_base</text>
+    <text x="400" y="426" fill="#8d96b2" font-size="12.5">交换律成立 · 重复合并不翻倍 · 实测相对误差 2.12e-16</text>
+    <text x="56" y="466" fill="#6f7a96" font-size="12">墓碑不可逆：被整理掉的记忆不会在合流时复活。</text>
+  </g>
+</svg>
