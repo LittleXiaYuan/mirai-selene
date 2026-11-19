@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
-import { ArrowLeft, ArrowUp, Download } from "lucide-react";
+import { ArrowLeft, ArrowUp, Download, Volume2 } from "lucide-react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { Alert } from "@/components/arc/alert/alert";
 import { Avatar } from "@/components/arc/avatar/avatar";
@@ -104,6 +104,26 @@ export function StageScreen({
   const reduce = useReducedMotion();
   const { beat, pending, error, run, reset } = useBeat();
   const voice = useProsody();
+  // 浏览器自带的语音合成：不依赖任何外部额度，断网也能读。
+  const [voiceAuto, setVoiceAuto] = useState(() => {
+    try {
+      return localStorage.getItem("mirai.voice.auto") === "1";
+    } catch {
+      return false;
+    }
+  });
+  const speak = useCallback((text: string) => {
+    if (typeof window === "undefined" || !("speechSynthesis" in window) || !text.trim()) return;
+    const synth = window.speechSynthesis;
+    synth.cancel();
+    const utter = new SpeechSynthesisUtterance(text.slice(0, 400));
+    utter.lang = "zh-CN";
+    utter.rate = 1;
+    utter.pitch = 1;
+    const zh = synth.getVoices().find((item) => /^zh|Chinese|中文/i.test(`${item.lang} ${item.name}`));
+    if (zh) utter.voice = zh;
+    synth.speak(utter);
+  }, []);
 
   const [tab, setTab] = useState<Tab | null>(null);
   const [typed, setTyped] = useState("");
@@ -303,6 +323,18 @@ export function StageScreen({
   const prose = beat.text || viewNode?.meta?.narration || specNode?.text || recall(viewNode ?? undefined);
   const sentences = useSentences(prose, beat.text ? `live-${viewNode?.id}` : viewNode?.id);
   const sent = sentences.current;
+
+  // 自动朗读：只有新的一句完整出现时才读，打字过程中不抢。
+  useEffect(() => {
+    if (!voiceAuto || !sent) return;
+    speak(sent);
+  }, [voiceAuto, sent, speak]);
+
+  useEffect(() => {
+    return () => {
+      if (typeof window !== "undefined") window.speechSynthesis?.cancel();
+    };
+  }, []);
 
   useEffect(() => {
     if (!sent) {
@@ -899,6 +931,14 @@ export function StageScreen({
               <Badge tone={face.badge} size="sm">
                 {face.label}
               </Badge>
+              <button
+                type="button"
+                className={styles.speak}
+                aria-label="朗读这一句"
+                onClick={() => speak(sent || typed)}
+              >
+                <Volume2 size={14} strokeWidth={1.75} aria-hidden />
+              </button>
             </div>
             {pending && !beat.text ? (
               <Skeleton lines={2} label="世界正在回应" />
@@ -927,6 +967,24 @@ export function StageScreen({
               onClick={() => setAuto((value) => !value)}
             >
               AUTO
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              className={styles.sysButton}
+              data-on={voiceAuto ? "" : undefined}
+              onClick={() => {
+                const next = !voiceAuto;
+                setVoiceAuto(next);
+                try {
+                  localStorage.setItem("mirai.voice.auto", next ? "1" : "0");
+                } catch {
+                  // 隐私模式下存不了，本次会话仍然生效
+                }
+                if (!next) window.speechSynthesis?.cancel();
+              }}
+            >
+              朗读
             </Button>
             <Button
               variant="ghost"
