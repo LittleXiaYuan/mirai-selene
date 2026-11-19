@@ -313,7 +313,9 @@ export function IngestScreen({
               <article className={styles.snapshot}>
                 <div className={styles.snapshotHead}>
                   <Badge tone={result.fallback || result.provider === "replay" ? "warning" : "info"} size="sm">
-                    {result.provider === "fetch"
+                    {result.provider === "xhs"
+                      ? "小红书实时读取"
+                      : result.provider === "fetch"
                       ? "实时抓取"
                       : result.provider === "replay"
                         ? "作业回放"

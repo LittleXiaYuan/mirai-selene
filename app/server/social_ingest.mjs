@@ -10,6 +10,7 @@
  */
 
 import { chatJson } from "./llm.mjs";
+import { fetchXhsNote, xhsConfigured } from "./xhs.mjs";
 
 const UA =
   "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0 Safari/537.36";
@@ -457,6 +458,7 @@ export async function ingestSocial({ url = "", text = "", player_faction = "" } 
   let snapshot = null;
   let fetched = false;
   let fallback = false;
+  let provider = "snapshot";
 
   if (String(text).trim()) {
     const body = String(text).trim();
@@ -478,7 +480,34 @@ export async function ingestSocial({ url = "", text = "", player_faction = "" } 
     } catch (error) {
       return { ok: false, error: error instanceof Error ? error.message : "链接不安全" };
     }
-    try {
+    // 小红书先走真实读取（需要 XHS_COOKIE）；失败再退回通用抓取，最后才是快照。
+    if (/xiaohongshu\.com|xhslink/i.test(target) && xhsConfigured()) {
+      try {
+        const note = await fetchXhsNote(target);
+        snapshot = {
+          id: `xhs-${hash(target).toString(36)}`,
+          source_type: "xiaohongshu",
+          source_url: target,
+          title: note.title,
+          body: note.body,
+          tags: note.tags,
+          comments: note.comments.map((comment) => ({
+            text: comment.text,
+            likes: comment.likes,
+            intent: "unknown",
+          })),
+          polarization: 0.72,
+          captured_at: new Date().toISOString(),
+          note: `小红书真实读取 · ${note.comments.length} 条评论`,
+        };
+        fetched = true;
+        provider = "xhs";
+      } catch {
+        // 登录态过期或链接缺 xsec_token，继续走下面的通用抓取
+      }
+    }
+
+    if (!snapshot) try {
       const page = await fetchPage(target);
       snapshot = {
         id: `url-${hash(target).toString(36)}`,
@@ -502,7 +531,10 @@ export async function ingestSocial({ url = "", text = "", player_faction = "" } 
         source_url: target,
         captured_at: new Date().toISOString(),
         polarization: 0.78,
-        note: "平台反爬或网络不可达，使用内置高保真快照",
+        note:
+          /xiaohongshu\.com|xhslink/i.test(target) && !xhsConfigured()
+            ? "未配置小红书登录态（XHS_COOKIE），这一版是示例快照"
+            : "平台反爬或网络不可达，使用内置快照",
       };
     }
   } else {
@@ -522,7 +554,7 @@ export async function ingestSocial({ url = "", text = "", player_faction = "" } 
     ok: true,
     fetched,
     fallback,
-    provider: fetched ? "fetch" : "snapshot",
+    provider,
     faction_source: llmFactions ? "llm" : "archetype",
     snapshot: {
       title: snapshot.title,

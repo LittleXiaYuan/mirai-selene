@@ -168,6 +168,19 @@ ls {REMOTE}
         "MIRAI_STUDIO_URL",
         "MIRAI_SECURE_COOKIE",
         "MIRAI_MAGIC_LOGIN",
+        "PLANNER_API_KEY",
+        "PLANNER_BASE_URL",
+        "PLANNER_MODEL",
+        "SENSENOVA_API_KEY",
+        "SENSENOVA_BASE_URL",
+        "SENSENOVA_CHAT_MODEL",
+        "CREDIT_MEDIA_API_KEY",
+        "CREDIT_MEDIA_BASE_URL",
+        "MIRAI_TTS_MODEL",
+        "MIRAI_STT_MODEL",
+        "MIRAI_VOICE",
+        "XHS_COOKIE",
+        "XHS_CLI",
     ):
         value = os.environ.get(key) or preserved.get(key)
         if value:
