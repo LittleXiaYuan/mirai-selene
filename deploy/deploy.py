@@ -181,6 +181,8 @@ ls {REMOTE}
         "MIRAI_VOICE",
         "XHS_COOKIE",
         "XHS_CLI",
+        "MODELSCOPE_API_TOKEN",
+        "MIRAI_RELAY_URL",
     ):
         value = os.environ.get(key) or preserved.get(key)
         if value:

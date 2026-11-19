@@ -369,3 +369,27 @@
 .mcpButton {
   min-width: 0;
 }
+
+.liveStrip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: var(--space-3) 0 0;
+  font-size: var(--text-xs);
+  line-height: 1.6;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.liveDot {
+  width: 6px;
+  height: 6px;
+  flex: none;
+  border-radius: 50%;
+  background: var(--text-muted);
+}
+
+.liveDot[data-live="true"] {
+  background: var(--success, #34d399);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--success, #34d399) 18%, transparent);
+}

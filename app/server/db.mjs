@@ -142,6 +142,23 @@ function migrateWorlds(db) {
   db.exec("PRAGMA user_version = 2");
 }
 
+/* ---------------- 实时统计 ---------------- */
+
+export function statsSnapshot(db) {
+  const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+  const count = (sql, ...args) => Number(db.prepare(sql).get(...args)?.n ?? 0);
+  return {
+    users: count("SELECT COUNT(*) n FROM users"),
+    worlds: count("SELECT COUNT(*) n FROM worlds_v2"),
+    publicWorlds: count("SELECT COUNT(*) n FROM worlds_v2 WHERE is_public = 1"),
+    orders: count("SELECT COUNT(*) n FROM orders"),
+    orders24h: count("SELECT COUNT(*) n FROM orders WHERE created_at >= ?", since),
+    creditsSpent: Number(db.prepare("SELECT COALESCE(SUM(price),0) v FROM orders").get()?.v ?? 0),
+    runs24h: count("SELECT COUNT(*) n FROM agent_runs WHERE created_at >= ?", since),
+    at: new Date().toISOString(),
+  };
+}
+
 /* ---------------- 钱包与订单 ---------------- */
 
 export function ensureWallet(db, userId) {

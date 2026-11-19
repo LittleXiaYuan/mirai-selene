@@ -77,12 +77,28 @@ export function AboutView({ onBack }: { onBack: () => void }) {
   const [paiStatus, setPaiStatus] = useState<{ ok: boolean; device?: string; params?: number } | null>(null);
   const [verifying, setVerifying] = useState(false);
   const [trace, setTrace] = useState<string | null>(null);
+  const [relay, setRelay] = useState<{ ok: boolean; modelAttached?: boolean; host?: string } | null>(null);
+  const [stats, setStats] = useState<{
+    users: number; worlds: number; orders: number; orders24h: number; creditsSpent: number; runs24h: number;
+  } | null>(null);
 
   useEffect(() => {
     let alive = true;
     void paiHealth().then((res) => {
       if (alive) setPaiStatus(res ?? { ok: false });
     });
+    fetch("/api/relay/health", { credentials: "same-origin" })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (alive && data) setRelay(data);
+      })
+      .catch(() => {});
+    fetch("/api/stats", { credentials: "same-origin" })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (alive && data) setStats(data);
+      })
+      .catch(() => {});
     void mcpRpc(1, "tools/list", {})
       .then((res) => {
         if (!alive) return;
@@ -218,6 +234,12 @@ export function AboutView({ onBack }: { onBack: () => void }) {
             <p className={styles.criteriaText}>下面四条都能在场上逐条验，不靠口头保证。</p>
           </div>
         </div>
+        <p className={styles.liveStrip}>
+          <span className={styles.liveDot} data-live={stats ? "true" : undefined} />
+          {stats
+            ? `现在的真实数字：${stats.users} 个账号 · ${stats.worlds} 个世界 · ${stats.orders} 笔订单（近 24h ${stats.orders24h}）· 共消耗 ${stats.creditsSpent} 额度 · 近 24h ${stats.runs24h} 次 Agent 运行`
+            : "正在读取服务端统计…"}
+        </p>
         <ol className={styles.criteriaList}>
           <li>90 秒内走完：链接 → 3–5 个阵营 → 三轮推演 → 选身份 → 舞台首幕。</li>
           <li>同一输入跑两次，动作序列一致；世界文件载入时 checksum 重算一致。</li>
@@ -245,6 +267,20 @@ export function AboutView({ onBack }: { onBack: () => void }) {
                 : mcpOnline
                   ? `在线 · ${mcpTools.length} 个 Agent 工具就绪`
                   : "未连上 /mcp 端点"}
+            </span>
+          </div>
+
+          <div className={styles.probeCard}>
+            <span className={styles.probeLabel}>
+              <span>魔搭创空间中转</span>
+              <span className={styles.probeDot} data-off={relay && !relay.ok ? "true" : undefined} />
+            </span>
+            <span className={styles.probeValue}>
+              {relay === null
+                ? "正在探测..."
+                : relay.ok
+                  ? `在线 · ${relay.host ?? "modelscope"} · ${relay.modelAttached ? "已接 L20 模型" : "模型未接入（只记请求）"}`
+                  : "中转未响应"}
             </span>
           </div>
 

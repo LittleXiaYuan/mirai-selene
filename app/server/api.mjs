@@ -39,6 +39,7 @@ import {
   listOrders,
   listWorlds,
   purchaseListing,
+  statsSnapshot,
   updateUserName,
   updateUserPassword,
   upsertWorld,
@@ -382,6 +383,35 @@ export async function handleApiRoute({ db, req, res, pathname }) {
 
   if (pathname === "/api/auth/email/status" && req.method === "GET") {
     return json(res, 200, { configured: mailConfigured(), appUrl: appUrl() }), true;
+  }
+
+  /* ---------------- 魔搭中转探针 ---------------- */
+
+  if (pathname === "/api/relay/health" && req.method === "GET") {
+    const token = process.env.MODELSCOPE_API_TOKEN || "";
+    const base = process.env.MIRAI_RELAY_URL || "https://studio-xiayuanovo-mirai-selene.api-inference.modelscope.net";
+    if (!token) return json(res, 200, { ok: false, reason: "relay-token-missing" }), true;
+    try {
+      const upstream = await fetch(`${base.replace(/\/+$/, "")}/relay/health`, {
+        headers: { Authorization: `Bearer ${token}` },
+        signal: AbortSignal.timeout(6000),
+      });
+      const data = await upstream.json().catch(() => ({}));
+      return json(res, 200, {
+        ok: upstream.ok && data.ok !== false,
+        modelAttached: Boolean(data.model_attached),
+        host: new URL(base).host,
+        writes: Number(data.writes ?? 0),
+      }), true;
+    } catch {
+      return json(res, 200, { ok: false, reason: "relay-unreachable" }), true;
+    }
+  }
+
+  /* ---------------- 公开统计 ---------------- */
+
+  if (pathname === "/api/stats" && req.method === "GET") {
+    return json(res, 200, statsSnapshot(db)), true;
   }
 
   /* ---------------- 钱包与世界市场 ---------------- */

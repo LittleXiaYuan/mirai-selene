@@ -38,6 +38,7 @@ type View = "landing" | "guest" | "forge" | "market" | "ingest" | "auth" | "home
 const VIEW_PATHS: Partial<Record<View, string>> = {
   landing: "/",
   guest: "/world",
+  home: "/workspace",
   forge: "/forge",
   market: "/market",
   ingest: "/ingest",
