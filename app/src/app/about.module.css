@@ -299,3 +299,73 @@
   color: var(--text-secondary);
   white-space: pre-wrap;
 }
+
+.criteriaText {
+  margin: 0;
+  font-size: var(--text-sm);
+  line-height: 1.7;
+  color: var(--text-secondary);
+}
+
+.criteriaRows {
+  display: grid;
+  gap: var(--space-3);
+  margin-top: var(--space-3);
+}
+
+.criteriaRow {
+  display: grid;
+  gap: 4px;
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--border-subtle);
+}
+
+.criteriaRow:first-child {
+  padding-top: 0;
+  border-top: 0;
+}
+
+.criteriaLabel {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+}
+
+.criteriaList {
+  margin: var(--space-3) 0 0;
+  padding-left: 1.4em;
+  list-style: decimal;
+  font-size: var(--text-sm);
+  line-height: 1.7;
+  color: var(--text-secondary);
+}
+
+.criteriaList li {
+  margin-bottom: 6px;
+}
+
+.criteriaList li:last-child {
+  margin-bottom: 0;
+}
+
+.criteriaList li::marker {
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.mcpButton {
+  max-width: 100%;
+  height: auto;
+  min-height: 32px;
+  padding-block: 6px;
+  white-space: normal;
+  text-align: left;
+  line-height: 1.5;
+}
+
+.mcpButton span {
+  white-space: normal;
+}
+
+.mcpButton {
+  min-width: 0;
+}

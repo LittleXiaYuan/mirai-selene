@@ -273,7 +273,14 @@ export function IngestScreen({
                 <Link2 size={15} strokeWidth={1.75} aria-hidden />
                 拆解阵营
               </Button>
-              {error ? <span className={styles.error}>{error}</span> : null}
+              {error ? (
+                <>
+                  <span className={styles.error}>{error}</span>
+                  <Button variant="secondary" size="sm" onClick={() => void runIngest()} loading={busy}>
+                    重试
+                  </Button>
+                </>
+              ) : null}
             </div>
 
             {cases.length ? (

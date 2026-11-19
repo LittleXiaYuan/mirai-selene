@@ -196,6 +196,37 @@ export function AboutView({ onBack }: { onBack: () => void }) {
       </p>
 
       <section className={styles.section} style={{ marginTop: 0 }}>
+        <h2 className={styles.sectionTitle}>任务定义</h2>
+        <p className={styles.sectionLead}>
+          评审先看这一条：谁在什么条件下用它，什么算做完。
+        </p>
+        <div className={styles.criteriaRows}>
+          <div className={styles.criteriaRow}>
+            <span className={styles.criteriaLabel}>谁在用</span>
+            <p className={styles.criteriaText}>
+              内容创作者与版权方；要预演高利害对话的人；研究者与评审。
+            </p>
+          </div>
+          <div className={styles.criteriaRow}>
+            <span className={styles.criteriaLabel}>什么时候触发</span>
+            <p className={styles.criteriaText}>
+              一条小红书 / 抖音链接或一段正文；一句话处境；一个导出的 .world 文件。
+            </p>
+          </div>
+          <div className={styles.criteriaRow}>
+            <span className={styles.criteriaLabel}>什么算成功</span>
+            <p className={styles.criteriaText}>下面四条都能在场上逐条验，不靠口头保证。</p>
+          </div>
+        </div>
+        <ol className={styles.criteriaList}>
+          <li>90 秒内走完：链接 → 3–5 个阵营 → 三轮推演 → 选身份 → 舞台首幕。</li>
+          <li>同一输入跑两次，动作序列一致；世界文件载入时 checksum 重算一致。</li>
+          <li>走完输出判断卡：五档分位数、ruin、分歧度；数字只来自状态核，不从语言模型来。</li>
+          <li>导出的 .world 在另一台机器导入后，分支与合流结果一致。</li>
+        </ol>
+      </section>
+
+      <section className={styles.section}>
         <h2 className={styles.sectionTitle}>实时 Agent 引擎 & MCP 动作空间</h2>
         <p className={styles.sectionLead}>
           Mirai-Selene 通过标准 Streamable HTTP（<code>/mcp</code>）向商汤小浣熊等外部 Agent 开放完整动作空间，
@@ -242,10 +273,19 @@ export function AboutView({ onBack }: { onBack: () => void }) {
           </div>
         )}
 
-        <Button variant="secondary" size="sm" onClick={() => void runLiveMcpVerify()} disabled={verifying || !mcpOnline}>
+        <Button
+          variant="secondary"
+          size="sm"
+          className={styles.mcpButton}
+          onClick={() => void runLiveMcpVerify()}
+          disabled={verifying || !mcpOnline}
+        >
           {verifying ? <CheckCircle2 size={14} aria-hidden /> : <Play size={14} aria-hidden />}
-          {verifying ? "正在向 /mcp 发起真实 JSON-RPC..." : "现场一键实测 MCP 全链路（开世界→预演→分叉→幂等合流→预测卡）"}
+          {verifying ? "正在向 /mcp 发起真实 JSON-RPC..." : "现场实测 MCP 全链路"}
         </Button>
+        <p className={styles.sectionLead} style={{ margin: "8px 0 0" }}>
+          一次点完：开世界 → 预演 → 分叉 → 幂等合流 → 预测卡。
+        </p>
 
         {trace && <pre className={styles.traceBox}>{trace}</pre>}
       </section>
@@ -359,6 +399,33 @@ export function AboutView({ onBack }: { onBack: () => void }) {
             把这些参数交给 Atlas 渲染成空间，就是两层接起来的样子；现在接的是我们自己的实时层。
           </li>
         </ul>
+      </section>
+
+      <section className={styles.section}>
+        <h2 className={styles.sectionTitle}>成本、安全与责任边界</h2>
+        <div className={styles.criteriaRows}>
+          <div className={styles.criteriaRow}>
+            <span className={styles.criteriaLabel}>调用成本</span>
+            <p className={styles.criteriaText}>
+              一次造世界 1 次模型调用，上限 3000 tokens；一次摄入拆解 1 次，上限 1200 tokens；
+              没配 key 时走模板，成本为 0。
+            </p>
+          </div>
+          <div className={styles.criteriaRow}>
+            <span className={styles.criteriaLabel}>限流与安全</span>
+            <p className={styles.criteriaText}>
+              摄入 15 次 / 分钟 / IP，推演 40 次；登录用 scrypt 哈希 + 服务端 session；
+              抓取只允许 http/https，拒绝私网与 localhost，不跟随重定向。
+            </p>
+          </div>
+          <div className={styles.criteriaRow}>
+            <span className={styles.criteriaLabel}>责任边界</span>
+            <p className={styles.criteriaText}>
+              不替代你的决定；内置快照会明确标注，不冒充实时抓取；
+              世界导出后不归服务器管，授权随文件走。
+            </p>
+          </div>
+        </div>
       </section>
 
       <section className={styles.section}>
