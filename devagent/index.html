@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mirai Dev Agent</title>
+<style>
+  :root { color-scheme: dark; --bg:#0b0d14; --panel:#12151f; --line:#242938; --text:#e8ecff; --muted:#8b93b8; --accent:#8b7dff; --ok:#34d399; --warn:#fbbf24; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; }
+  body { background: var(--bg); color: var(--text); font: 14px/1.6 -apple-system, "Inter", "PingFang SC", "Microsoft YaHei", sans-serif; display: flex; flex-direction: column; }
+  header { display: flex; align-items: center; gap: 10px; padding: calc(10px + env(safe-area-inset-top)) 14px 10px; border-bottom: 1px solid var(--line); }
+  header b { font-weight: 600; letter-spacing: .02em; }
+  header .tag { font-size: 11px; color: var(--muted); border: 1px solid var(--line); border-radius: 999px; padding: 2px 8px; }
+  header .spacer { flex: 1; }
+  header button { background: none; border: 1px solid var(--line); color: var(--muted); border-radius: 8px; padding: 5px 9px; font-size: 12px; cursor: pointer; }
+  header button:hover { color: var(--text); border-color: #3a4257; }
+  #state { padding: 8px 14px; border-bottom: 1px solid var(--line); font-size: 12px; color: var(--muted); display: flex; gap: 12px; flex-wrap: wrap; }
+  #state code { color: var(--text); font-family: ui-monospace, Consolas, monospace; }
+  #log { flex: 1; overflow: auto; padding: 14px; display: flex; flex-direction: column; gap: 12px; }
+  .msg { max-width: 100%; }
+  .msg.user { align-self: flex-end; background: #1c2233; border: 1px solid #2b3348; border-radius: 12px; padding: 8px 12px; white-space: pre-wrap; }
+  .msg.agent { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; }
+  .msg pre { margin: 0; white-space: pre-wrap; word-break: break-word; font: 12.5px/1.55 ui-monospace, Consolas, monospace; color: #cfd6ef; max-height: 50vh; overflow: auto; }
+  .msg .meta { font-size: 11px; color: var(--muted); margin-bottom: 6px; }
+  form { display: flex; gap: 8px; padding: 10px 14px calc(12px + env(safe-area-inset-bottom)); border-top: 1px solid var(--line); background: #0d101a; }
+  textarea { flex: 1; resize: none; min-height: 44px; max-height: 120px; background: #151a26; color: var(--text); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; font: inherit; }
+  form button { background: var(--accent); color: #0b0d14; border: 0; border-radius: 10px; padding: 0 16px; font-weight: 600; cursor: pointer; }
+  form button:disabled { opacity: .5; cursor: default; }
+  #diff { padding: 8px 14px; border-top: 1px solid var(--line); background: #0d101a; font: 11.5px/1.5 ui-monospace, Consolas, monospace; color: var(--muted); white-space: pre-wrap; max-height: 18vh; overflow: auto; display: none; }
+  #diff[data-on] { display: block; }
+</style>
+</head>
+<body>
+<header>
+  <b>Mirai Dev Agent</b>
+  <span class="tag" id="model">…</span>
+  <span class="spacer"></span>
+  <button id="undo" type="button">撤销未提交</button>
+  <button id="commit" type="button">提交</button>
+</header>
+<div id="state">正在读取仓库…</div>
+<div id="log"></div>
+<div id="diff"></div>
+<form id="form">
+  <textarea id="input" placeholder="说一件事，例如：把市场卡片的购买按钮改成整张卡都能点" rows="1"></textarea>
+  <button id="send" type="submit">交给它</button>
+</form>
+<script>
+const log = document.getElementById("log");
+const stateEl = document.getElementById("state");
+const diffEl = document.getElementById("diff");
+const input = document.getElementById("input");
+const send = document.getElementById("send");
+const modelEl = document.getElementById("model");
+
+function add(role, text) {
+  const el = document.createElement("div");
+  el.className = "msg " + role;
+  if (role === "agent") {
+    const meta = document.createElement("div");
+    meta.className = "meta";
+    meta.textContent = "agent";
+    el.appendChild(meta);
+  }
+  const pre = document.createElement("pre");
+  pre.textContent = text;
+  el.appendChild(pre);
+  log.appendChild(el);
+  log.scrollTop = log.scrollHeight;
+  return pre;
+}
+
+async function refresh() {
+  try {
+    const res = await fetch("api/state", { credentials: "same-origin" });
+    const s = await res.json();
+    modelEl.textContent = s.model;
+    const changed = (s.changed || []).length;
+    stateEl.innerHTML = "";
+    const bits = [
+      `分支 <code>${s.branch}</code>`,
+      `改动 <code>${changed}</code> 个文件`,
+      s.last ? `最近提交 <code>${s.last}</code>` : "",
+    ].filter(Boolean);
+    stateEl.innerHTML = bits.join(" · ");
+    diffEl.textContent = s.diffstat || "";
+    diffEl.toggleAttribute("data-on", Boolean(s.diffstat));
+  } catch {
+    stateEl.textContent = "读不到仓库状态";
+  }
+}
+
+async function poll(id, pre) {
+  for (;;) {
+    await new Promise((r) => setTimeout(r, 900));
+    const res = await fetch("api/job/" + id, { credentials: "same-origin" });
+    if (!res.ok) break;
+    const job = await res.json();
+    pre.textContent = job.output || "…";
+    log.scrollTop = log.scrollHeight;
+    if (job.status !== "running") {
+      pre.textContent += `\n\n[${job.status}${job.ms ? " · " + Math.round(job.ms / 1000) + "s" : ""}]`;
+      break;
+    }
+  }
+  await refresh();
+}
+
+document.getElementById("form").addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const message = input.value.trim();
+  if (!message) return;
+  input.value = "";
+  add("user", message);
+  const pre = add("agent", "正在读代码…");
+  send.disabled = true;
+  try {
+    const res = await fetch("api/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "same-origin",
+      body: JSON.stringify({ message }),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      pre.textContent = data.error || "提交失败";
+    } else {
+      await poll(data.id, pre);
+    }
+  } catch (error) {
+    pre.textContent = String(error);
+  } finally {
+    send.disabled = false;
+  }
+});
+
+document.getElementById("undo").addEventListener("click", async () => {
+  if (!confirm("丢弃所有未提交改动？")) return;
+  await fetch("api/undo", { method: "POST", credentials: "same-origin" });
+  await refresh();
+  add("agent", "已撤销未提交改动。");
+});
+
+document.getElementById("commit").addEventListener("click", async () => {
+  const message = prompt("提交信息", "dev agent: update");
+  if (message === null) return;
+  const res = await fetch("api/commit", {
+    method: "POST",
+    credentials: "same-origin",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ message }),
+  });
+  const data = await res.json();
+  add("agent", data.ok ? "已提交：\n" + (data.out || "") : "提交失败");
+  await refresh();
+});
+
+refresh();
+</script>
+</body>
+</html>

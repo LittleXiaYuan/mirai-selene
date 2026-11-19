@@ -672,6 +672,12 @@ const handler = async (req, res) => {
   const pathname = (req.url || "/").split("?")[0];
   const hasBearer = (req.headers.authorization || "").startsWith("Bearer ");
 
+  // 独立子域 miraidev.*：整站只服务开发 Agent，先于 API 路由判断
+  if (String(req.headers.host || "").toLowerCase().startsWith("miraidev.")) {
+    proxyAgent(req, res, pathname, false);
+    return;
+  }
+
   if (pathname.startsWith("/api/") || pathname.startsWith("/mirai-api/") || pathname.startsWith("/mcp")) {
     applyCors(req, res);
   }
@@ -838,12 +844,6 @@ const handler = async (req, res) => {
     return;
   }
 
-  // 云开发终端：反代到本机 ttyd，复用主站证书与域名
-  if (pathname === "/dev" || pathname.startsWith("/dev/")) {
-    proxyDev(req, res);
-    return;
-  }
-
   // 生成的插画：同源发出（OSS 直链不允许跨域，img 加载不出来）
   if (pathname.startsWith("/mirai-art/")) {
     serveArt(req, res, pathname.slice("/mirai-art/".length));
@@ -853,19 +853,19 @@ const handler = async (req, res) => {
   serveStatic(req, res, pathname);
 };
 
-/* ---------------- 云开发终端：/dev → 本机 ttyd ---------------- */
+/* ---------------- 云开发 Agent：/agent → 本机 8090 ---------------- */
 
-const DEV_HOST = "127.0.0.1";
-const DEV_PORT = Number(process.env.MIRAI_DEV_PORT || 7681);
+const AGENT_PORT = Number(process.env.MIRAI_AGENT_PORT || 8090);
 
-function proxyDev(req, res) {
+function proxyAgent(req, res, pathname, strip = true) {
+  const sub = strip ? pathname.slice("/agent".length) || "/" : pathname || "/";
   const upstream = http.request(
     {
-      host: DEV_HOST,
-      port: DEV_PORT,
+      host: "127.0.0.1",
+      port: AGENT_PORT,
       method: req.method,
-      path: req.url,
-      headers: { ...req.headers, host: `${DEV_HOST}:${DEV_PORT}` },
+      path: sub || "/",
+      headers: { ...req.headers, host: `127.0.0.1:${AGENT_PORT}` },
     },
     (up) => {
       res.writeHead(up.statusCode || 502, up.headers);
@@ -874,41 +874,12 @@ function proxyDev(req, res) {
   );
   upstream.on("error", () => {
     if (!res.headersSent) res.writeHead(502, { "Content-Type": "text/plain; charset=utf-8" });
-    res.end("dev terminal offline");
+    res.end("dev agent offline");
   });
   req.pipe(upstream);
 }
 
-function attachDevUpgrade(srv) {
-  srv.on("upgrade", (req, socket) => {
-    if (!String(req.url || "").startsWith("/dev/")) {
-      socket.destroy();
-      return;
-    }
-    const upstream = http.request({
-      host: DEV_HOST,
-      port: DEV_PORT,
-      method: req.method,
-      path: req.url,
-      headers: { ...req.headers, host: `${DEV_HOST}:${DEV_PORT}` },
-    });
-    upstream.on("upgrade", (up, upSocket, upHead) => {
-      const lines = ["HTTP/1.1 101 Switching Protocols"];
-      for (const [key, value] of Object.entries(up.headers)) lines.push(`${key}: ${value}`);
-      socket.write(`${lines.join("\r\n")}\r\n\r\n`);
-      if (upHead && upHead.length) socket.write(upHead);
-      upSocket.pipe(socket);
-      socket.pipe(upSocket);
-      upSocket.on("error", () => socket.destroy());
-      socket.on("error", () => upSocket.destroy());
-    });
-    upstream.on("error", () => socket.destroy());
-    upstream.end();
-  });
-}
-
 const server = http.createServer(handler);
-attachDevUpgrade(server);
 
 // 每小时清一次过期会话、限流桶与过期作业
 setInterval(() => {
@@ -936,7 +907,6 @@ if (TLS_CERT && TLS_KEY && existsSync(TLS_CERT) && existsSync(TLS_KEY)) {
     { cert: readFileSync(TLS_CERT), key: readFileSync(TLS_KEY) },
     handler,
   );
-  attachDevUpgrade(tlsServer);
   tlsServer.listen(TLS_PORT, HOST, () => {
     console.log(`  TLS:  https://${HOST === "0.0.0.0" ? "localhost" : HOST}:${TLS_PORT}`);
   });
