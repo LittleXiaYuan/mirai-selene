@@ -34,7 +34,7 @@ import { clearSpec, currentSpec, loadSpec, specHealth } from "./spec.mjs";
 import { assetProvider, generateAsset, planWorld } from "./assets/factory.mjs";
 import { planAssetTasks } from "./assets/prompt-library.mjs";
 import { dispatch as dispatchMcp, setMarketAdapter, setSpecPublisher } from "./mcp-core.mjs";
-import { forgeTurn, startForge } from "./forge.mjs";
+import { forgeExtract, forgeFromAnswers, forgeTurn, startForge } from "./forge.mjs";
 import { renderShell } from "./shell.mjs";
 import { ingestSocial, socialCases } from "./social_ingest.mjs";
 import { simulateAgents } from "./agent_sim.mjs";
@@ -280,6 +280,28 @@ async function handleSocialRoute(req, res, pathname, db, ownerKey) {
 async function handleForge(req, res, route, db, ownerKey) {
   if (route === "start" && req.method === "POST") {
     json(res, 200, startForge(db));
+    return;
+  }
+  if (route === "extract" && req.method === "POST") {
+    const body = await readBody(req);
+    const result = await forgeExtract(body?.text);
+    json(res, result.ok ? 200 : 400, result);
+    return;
+  }
+  if (route === "from-answers" && req.method === "POST") {
+    const body = await readBody(req);
+    const result = await forgeFromAnswers(body?.answers);
+    if (result.ok && result.spec) {
+      saveRun(db, {
+        id: `upload-${Date.now().toString(36)}`,
+        ownerKey,
+        kind: "forge",
+        title: result.spec.title,
+        input: body,
+        output: { source: result.source },
+      });
+    }
+    json(res, result.ok ? 200 : 400, result);
     return;
   }
   if (route === "turn" && req.method === "POST") {
@@ -816,6 +838,12 @@ const handler = async (req, res) => {
     return;
   }
 
+  // 云开发终端：反代到本机 ttyd，复用主站证书与域名
+  if (pathname === "/dev" || pathname.startsWith("/dev/")) {
+    proxyDev(req, res);
+    return;
+  }
+
   // 生成的插画：同源发出（OSS 直链不允许跨域，img 加载不出来）
   if (pathname.startsWith("/mirai-art/")) {
     serveArt(req, res, pathname.slice("/mirai-art/".length));
@@ -825,7 +853,62 @@ const handler = async (req, res) => {
   serveStatic(req, res, pathname);
 };
 
+/* ---------------- 云开发终端：/dev → 本机 ttyd ---------------- */
+
+const DEV_HOST = "127.0.0.1";
+const DEV_PORT = Number(process.env.MIRAI_DEV_PORT || 7681);
+
+function proxyDev(req, res) {
+  const upstream = http.request(
+    {
+      host: DEV_HOST,
+      port: DEV_PORT,
+      method: req.method,
+      path: req.url,
+      headers: { ...req.headers, host: `${DEV_HOST}:${DEV_PORT}` },
+    },
+    (up) => {
+      res.writeHead(up.statusCode || 502, up.headers);
+      up.pipe(res);
+    },
+  );
+  upstream.on("error", () => {
+    if (!res.headersSent) res.writeHead(502, { "Content-Type": "text/plain; charset=utf-8" });
+    res.end("dev terminal offline");
+  });
+  req.pipe(upstream);
+}
+
+function attachDevUpgrade(srv) {
+  srv.on("upgrade", (req, socket) => {
+    if (!String(req.url || "").startsWith("/dev/")) {
+      socket.destroy();
+      return;
+    }
+    const upstream = http.request({
+      host: DEV_HOST,
+      port: DEV_PORT,
+      method: req.method,
+      path: req.url,
+      headers: { ...req.headers, host: `${DEV_HOST}:${DEV_PORT}` },
+    });
+    upstream.on("upgrade", (up, upSocket, upHead) => {
+      const lines = ["HTTP/1.1 101 Switching Protocols"];
+      for (const [key, value] of Object.entries(up.headers)) lines.push(`${key}: ${value}`);
+      socket.write(`${lines.join("\r\n")}\r\n\r\n`);
+      if (upHead && upHead.length) socket.write(upHead);
+      upSocket.pipe(socket);
+      socket.pipe(upSocket);
+      upSocket.on("error", () => socket.destroy());
+      socket.on("error", () => upSocket.destroy());
+    });
+    upstream.on("error", () => socket.destroy());
+    upstream.end();
+  });
+}
+
 const server = http.createServer(handler);
+attachDevUpgrade(server);
 
 // 每小时清一次过期会话、限流桶与过期作业
 setInterval(() => {
@@ -853,6 +936,7 @@ if (TLS_CERT && TLS_KEY && existsSync(TLS_CERT) && existsSync(TLS_KEY)) {
     { cert: readFileSync(TLS_CERT), key: readFileSync(TLS_KEY) },
     handler,
   );
+  attachDevUpgrade(tlsServer);
   tlsServer.listen(TLS_PORT, HOST, () => {
     console.log(`  TLS:  https://${HOST === "0.0.0.0" ? "localhost" : HOST}:${TLS_PORT}`);
   });
