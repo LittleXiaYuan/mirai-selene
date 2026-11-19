@@ -8,14 +8,6 @@
   overflow: hidden;
 }
 
-.top {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  flex: none;
-  min-height: 36px;
-}
-
 .brand {
   padding: 0;
   background: none;
@@ -31,10 +23,6 @@
 
 .brand span {
   color: var(--accent);
-}
-
-.spacer {
-  flex: 1;
 }
 
 .hintText {

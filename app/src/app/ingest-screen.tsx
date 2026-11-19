@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   Activity,
-  ArrowLeft,
   ArrowRight,
   Link2,
   Lock,
@@ -13,6 +12,7 @@ import {
 import { Avatar } from "@/components/arc/avatar/avatar";
 import { Badge } from "@/components/arc/badge/badge";
 import { Button } from "@/components/arc/button/button";
+import { AppTopBar } from "./app-topbar";
 import { EmptyState } from "@/components/arc/empty-state/empty-state";
 import { Input } from "@/components/arc/input/input";
 import SegmentedControl from "@/components/arc/segmented-control/segmented-control";
@@ -45,12 +45,18 @@ export function IngestScreen({
   onEnter,
   onWorlds,
   onForge,
+  onAuth,
+  onWorkspace,
+  signedInName,
   autoRunDemo,
 }: {
   onHome: () => void;
   onEnter: (spec: IngestResult["spec"]) => void;
   onWorlds: () => void;
   onForge: () => void;
+  onAuth: () => void;
+  onWorkspace: () => void;
+  signedInName?: string;
   autoRunDemo?: boolean;
 }) {
   const [mode, setMode] = useState<Mode>("link");
@@ -216,25 +222,18 @@ export function IngestScreen({
 
   return (
     <div className={styles.page}>
-      <header className={styles.top}>
-        <Button variant="ghost" size="sm" onClick={onWorlds}>
-          <ArrowLeft size={15} strokeWidth={1.75} aria-hidden />
-          世界列表
-        </Button>
-        <button
-          type="button"
-          className={styles.brand}
-          onClick={onHome}
-          aria-label="回到首页"
-        >
-          Mirai<span>·</span>Selene
-        </button>
-        <span className={styles.spacer} />
+      <AppTopBar
+        onBack={onWorlds}
+        onHome={onHome}
+        onAuth={onAuth}
+        onWorkspace={onWorkspace}
+        signedInName={signedInName}
+      >
         <Button variant="ghost" size="sm" onClick={onForge}>
           <Sparkles size={14} strokeWidth={1.75} aria-hidden />
           用对话造
         </Button>
-      </header>
+      </AppTopBar>
 
       <div className={styles.layout} ref={layoutRef}>
         <section className={styles.left}>

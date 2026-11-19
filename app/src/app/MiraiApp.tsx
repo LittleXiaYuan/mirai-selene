@@ -423,6 +423,9 @@ export function MiraiApp() {
       {view === "forge" && (
         <ForgeScreen
           onHome={() => setView("landing")}
+          onAuth={() => setView("auth")}
+          onWorkspace={() => setView("home")}
+          signedInName={session.user?.name}
           onEnter={(spec) => {
             w.loadSpec(spec);
             setView("stage");
@@ -501,6 +504,9 @@ export function MiraiApp() {
         <IngestScreen
           autoRunDemo={demoAutoIngest}
           onHome={() => setView("landing")}
+          onAuth={() => setView("auth")}
+          onWorkspace={() => setView("home")}
+          signedInName={session.user?.name}
           onEnter={(spec) => {
             w.loadSpec(spec);
             setDemoAutoIngest(false);
@@ -513,6 +519,9 @@ export function MiraiApp() {
       {view === "market" && (
         <MarketScreen
           onHome={() => setView("landing")}
+          onAuth={() => setView("auth")}
+          onWorkspace={() => setView("home")}
+          signedInName={session.user?.name}
           onBack={() => goBack(session.user ? "home" : "landing")}
           onForge={() => setView("forge")}
           onEnter={(spec) => {
@@ -546,7 +555,7 @@ export function MiraiApp() {
             specSync={specSync}
             demoMode={demoMode}
             onEdit={() => setView("edit")}
-            onHome={() => setView(session.user ? "home" : "guest")}
+            onHome={() => goBack(session.user ? "home" : "guest")}
             onForge={() => setView("forge")}
             onEnd={() => setView("ending")}
             onCompare={() => setView("compare")}
@@ -555,7 +564,7 @@ export function MiraiApp() {
       )}
       {view === "edit" && (
         <Suspense fallback={<RouteFallback />}>
-          <EditScreen w={w} onPlay={() => setView("stage")} onHome={() => setView("home")} />
+          <EditScreen w={w} onPlay={() => setView("stage")} onHome={() => goBack("home")} />
         </Suspense>
       )}
       {view === "about" && (

@@ -1,6 +1,7 @@
 import { useCallback, useRef, useState, type CSSProperties } from "react";
-import { ArrowLeft, ArrowRight, Sparkles } from "lucide-react";
+import { ArrowRight, Sparkles } from "lucide-react";
 import { Button } from "@/components/arc/button/button";
+import { AppTopBar } from "./app-topbar";
 import { AiChat, type ChatRespond } from "@/components/arc/blocks/ai-chat/ai-chat";
 import type { MarkProps } from "@/components/arc/blocks/ai-chat/ai-chat-marks";
 import type { AssetTask } from "./spec-api";
@@ -36,10 +37,16 @@ export function ForgeScreen({
   onHome,
   onEnter,
   onWorlds,
+  onAuth,
+  onWorkspace,
+  signedInName,
 }: {
   onHome: () => void;
   onEnter: (spec: WorldSpec) => void;
   onWorlds: () => void;
+  onAuth: () => void;
+  onWorkspace: () => void;
+  signedInName?: string;
 }) {
   const [spec, setSpec] = useState<WorldSpec | null>(null);
   const [tasks, setTasks] = useState<AssetTask[]>([]);
@@ -96,22 +103,15 @@ export function ForgeScreen({
 
   return (
     <div className={styles.page}>
-      <header className={styles.top}>
-        <Button variant="ghost" size="sm" onClick={onWorlds}>
-          <ArrowLeft size={15} strokeWidth={1.75} aria-hidden />
-          世界列表
-        </Button>
-        <button
-          type="button"
-          className={styles.brand}
-          onClick={onHome}
-          aria-label="回到首页"
-        >
-          Mirai<span>·</span>Selene
-        </button>
-        <span className={styles.spacer} />
+      <AppTopBar
+        onBack={onWorlds}
+        onHome={onHome}
+        onAuth={onAuth}
+        onWorkspace={onWorkspace}
+        signedInName={signedInName}
+      >
         <span className={styles.hintText}>说出一个处境，Selene 会问六件事</span>
-      </header>
+      </AppTopBar>
 
       <div className={styles.layout} data-preview={spec ? "" : undefined}>
         <section

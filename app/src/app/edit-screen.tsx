@@ -128,7 +128,7 @@ export function EditScreen({
     <div className={styles.edit}>
       <header className={styles.toolbar}>
         <div className={styles.toolbarTop}>
-          <button className="icon-button" onClick={onHome} aria-label="回到世界列表">
+          <button className="icon-button" onClick={onHome} aria-label="返回上一页">
             <ArrowLeft size={20} strokeWidth={1.75} aria-hidden />
           </button>
           <div className={styles.toolbarTitle}>

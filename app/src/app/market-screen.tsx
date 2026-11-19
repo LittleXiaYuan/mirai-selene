@@ -6,6 +6,7 @@ import SegmentedControl from "@/components/arc/segmented-control/segmented-contr
 import type { WorldSpec } from "@/world/spec";
 import { SPEC_SAMPLES } from "@/world/spec-samples";
 import { previewShell } from "./game-shell";
+import { AppTopBar } from "./app-topbar";
 import styles from "./market.module.css";
 
 const LISTINGS: { spec: WorldSpec; tag: string; tone: BadgeTone; note: string }[] = [
@@ -63,14 +64,27 @@ export function MarketScreen({
   onBack,
   onForge,
   onEnter,
+  onAuth,
+  onWorkspace,
+  signedInName,
 }: {
   onHome: () => void;
   onBack: () => void;
   onForge: () => void;
   onEnter: (spec: WorldSpec) => void;
+  onAuth: () => void;
+  onWorkspace: () => void;
+  signedInName?: string;
 }) {
   return (
     <div className={styles.page}>
+      <AppTopBar
+        onBack={onBack}
+        onHome={onHome}
+        onAuth={onAuth}
+        onWorkspace={onWorkspace}
+        signedInName={signedInName}
+      />
       <header className={styles.head}>
         <div className={styles.title}>
           <h1>世界市场</h1>
@@ -79,12 +93,6 @@ export function MarketScreen({
           </p>
         </div>
         <div className={styles.headActions}>
-          <Button variant="ghost" onClick={onHome}>
-            首页
-          </Button>
-          <Button variant="ghost" onClick={onBack}>
-            世界列表
-          </Button>
           <Button variant="secondary" onClick={onForge}>
             <Sparkles size={16} strokeWidth={1.75} aria-hidden />
             用对话造一个

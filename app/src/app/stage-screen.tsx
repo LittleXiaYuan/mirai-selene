@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
-import { ArrowUp, Download } from "lucide-react";
+import { ArrowLeft, ArrowUp, Download } from "lucide-react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { Alert } from "@/components/arc/alert/alert";
 import { Avatar } from "@/components/arc/avatar/avatar";
@@ -713,7 +713,7 @@ export function StageScreen({
         <EmptyState
           title="这个世界还没有内容"
           description="先新建一个世界，或者从文件载入一个。"
-          action={<Button onClick={onHome}>回到世界列表</Button>}
+          action={<Button onClick={onHome}>返回</Button>}
         />
       </div>
     );
@@ -779,9 +779,14 @@ export function StageScreen({
       </div>
 
       <header className={styles.top}>
-        <Button variant="ghost" size="sm" onClick={onHome}>
-          世界列表
-        </Button>
+        <button
+          type="button"
+          className="icon-button"
+          onClick={onHome}
+          aria-label="返回上一页"
+        >
+          <ArrowLeft size={20} strokeWidth={1.75} aria-hidden />
+        </button>
         <span className={styles.topTitle}>{w.active?.name ?? "未命名世界"}</span>
         <span className={styles.topSpacer} />
         <Button variant="ghost" size="sm" onClick={onEdit}>
