@@ -59,10 +59,12 @@ const PLANS = [
  * 这里先放可导入的精选世界；分叉破局后的分润走世界文件里的血缘树。
  */
 export function MarketScreen({
+  onHome,
   onBack,
   onForge,
   onEnter,
 }: {
+  onHome: () => void;
   onBack: () => void;
   onForge: () => void;
   onEnter: (spec: WorldSpec) => void;
@@ -77,6 +79,9 @@ export function MarketScreen({
           </p>
         </div>
         <div className={styles.headActions}>
+          <Button variant="ghost" onClick={onHome}>
+            首页
+          </Button>
           <Button variant="ghost" onClick={onBack}>
             世界列表
           </Button>

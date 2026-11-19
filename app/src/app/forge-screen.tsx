@@ -33,9 +33,11 @@ const delay = (ms: number) => new Promise((resolve) => window.setTimeout(resolve
  * 对话负责问六件事；答完把 Spec 放进右侧预览，点「走进去」交给舞台。
  */
 export function ForgeScreen({
+  onHome,
   onEnter,
   onWorlds,
 }: {
+  onHome: () => void;
   onEnter: (spec: WorldSpec) => void;
   onWorlds: () => void;
 }) {
@@ -99,9 +101,14 @@ export function ForgeScreen({
           <ArrowLeft size={15} strokeWidth={1.75} aria-hidden />
           世界列表
         </Button>
-        <span className={styles.brand}>
+        <button
+          type="button"
+          className={styles.brand}
+          onClick={onHome}
+          aria-label="回到首页"
+        >
           Mirai<span>·</span>Selene
-        </span>
+        </button>
         <span className={styles.spacer} />
         <span className={styles.hintText}>说出一个处境，Selene 会问六件事</span>
       </header>

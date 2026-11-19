@@ -142,6 +142,7 @@ function lastActiveAt(world: WorldMeta | undefined) {
 export function WorldStudio({
   w,
   session,
+  onHome,
   onOpen,
   onForge,
   onMarket,
@@ -153,6 +154,7 @@ export function WorldStudio({
 }: {
   w: UseWorlds;
   session: UseSession;
+  onHome: () => void;
   onOpen: () => void;
   onForge: () => void;
   onMarket: () => void;
@@ -305,9 +307,14 @@ export function WorldStudio({
     <>
       {!inDrawer ? (
         <div className={styles.brandRow}>
-          <span className={styles.brand}>
+          <button
+            type="button"
+            className={styles.brand}
+            onClick={onHome}
+            aria-label="回到首页"
+          >
             Mirai<span>·</span>Selene
-          </span>
+          </button>
           {session.user ? (
             <Button
               variant="ghost"

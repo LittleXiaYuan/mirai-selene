@@ -41,11 +41,13 @@ type IngestView = Omit<IngestResult, "spec"> & { spec?: IngestResult["spec"] };
  * 模型层未接时不伪造矩阵：推演标注为本地策略沙盘。
  */
 export function IngestScreen({
+  onHome,
   onEnter,
   onWorlds,
   onForge,
   autoRunDemo,
 }: {
+  onHome: () => void;
   onEnter: (spec: IngestResult["spec"]) => void;
   onWorlds: () => void;
   onForge: () => void;
@@ -219,9 +221,14 @@ export function IngestScreen({
           <ArrowLeft size={15} strokeWidth={1.75} aria-hidden />
           世界列表
         </Button>
-        <span className={styles.brand}>
+        <button
+          type="button"
+          className={styles.brand}
+          onClick={onHome}
+          aria-label="回到首页"
+        >
           Mirai<span>·</span>Selene
-        </span>
+        </button>
         <span className={styles.spacer} />
         <Button variant="ghost" size="sm" onClick={onForge}>
           <Sparkles size={14} strokeWidth={1.75} aria-hidden />

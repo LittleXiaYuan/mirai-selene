@@ -114,7 +114,21 @@ export function MiraiApp() {
   const w = useWorlds();
   // 上线产品的入口是宣传页：先回答「这是什么」，再给「直接体验 / 登录」两个动作。
   // 老的世界列表退到「开始体验」之后，不再一进来就甩一屏管理操作。
-  const [view, setView] = useState<View>(() => viewFromPath(window.location.pathname) ?? "landing");
+  const [view, setViewState] = useState<View>(
+    () => viewFromPath(window.location.pathname) ?? "landing",
+  );
+  // 栈只记住"从哪来"，返回键才不会被几个子应用踢回一个不相干的地方。
+  const navView = useRef<View>(view);
+  navView.current = view;
+  const navStack = useRef<View[]>([]);
+  const setView = useCallback((next: View) => {
+    if (next === navView.current) return;
+    navStack.current.push(navView.current);
+    setViewState(next);
+  }, []);
+  const goBack = useCallback((fallback: View) => {
+    setViewState(navStack.current.pop() ?? fallback);
+  }, []);
   // 邮件里的重置链接形如 /?reset=<token>；解析一次即可。
   const [resetToken, setResetToken] = useState<string | null>(() => {
     try {
@@ -155,7 +169,11 @@ export function MiraiApp() {
   }, [view]);
 
   useEffect(() => {
-    const onPop = () => setView(viewFromPath(window.location.pathname) ?? "landing");
+    const onPop = () => {
+      // 浏览器后退是"外部"导航：清掉应用内栈，避免下一次返回又弹回去。
+      navStack.current = [];
+      setViewState(viewFromPath(window.location.pathname) ?? "landing");
+    };
     window.addEventListener("popstate", onPop);
     return () => window.removeEventListener("popstate", onPop);
   }, []);
@@ -404,11 +422,12 @@ export function MiraiApp() {
       )}
       {view === "forge" && (
         <ForgeScreen
+          onHome={() => setView("landing")}
           onEnter={(spec) => {
             w.loadSpec(spec);
             setView("stage");
           }}
-          onWorlds={() => setView(session.user ? "home" : "guest")}
+          onWorlds={() => goBack(session.user ? "home" : "landing")}
         />
       )}
       {view === "auth" && (
@@ -455,6 +474,7 @@ export function MiraiApp() {
         <HomeScreen
           w={w}
           session={session}
+          onHome={() => setView("landing")}
           onOpen={() => setView("stage")}
           onDemo={openDemoMode}
           onForge={() => setView("forge")}
@@ -480,18 +500,20 @@ export function MiraiApp() {
       {view === "ingest" && (
         <IngestScreen
           autoRunDemo={demoAutoIngest}
+          onHome={() => setView("landing")}
           onEnter={(spec) => {
             w.loadSpec(spec);
             setDemoAutoIngest(false);
             setView("stage");
           }}
-          onWorlds={() => setView(session.user ? "home" : "guest")}
+          onWorlds={() => goBack(session.user ? "home" : "landing")}
           onForge={() => setView("forge")}
         />
       )}
       {view === "market" && (
         <MarketScreen
-          onBack={() => setView(session.user ? "home" : "guest")}
+          onHome={() => setView("landing")}
+          onBack={() => goBack(session.user ? "home" : "landing")}
           onForge={() => setView("forge")}
           onEnter={(spec) => {
             w.loadSpec(spec);
@@ -503,6 +525,7 @@ export function MiraiApp() {
         <WorldStudio
           w={w}
           session={session}
+          onHome={() => setView("landing")}
           onOpen={() => setView("stage")}
           onForge={() => setView("forge")}
           onMarket={() => setView("market")}
@@ -537,7 +560,7 @@ export function MiraiApp() {
       )}
       {view === "about" && (
         <Suspense fallback={<RouteFallback />}>
-          <AboutView onBack={() => setView(session.user ? "home" : "landing")} />
+          <AboutView onBack={() => goBack(session.user ? "home" : "landing")} />
         </Suspense>
       )}
       {view === "compare" && (

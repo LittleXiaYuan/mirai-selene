@@ -37,6 +37,7 @@ function specCover(spec: WorldSpec): string {
 export function HomeScreen({
   w,
   session,
+  onHome,
   onOpen,
   onDemo,
   onForge,
@@ -51,6 +52,7 @@ export function HomeScreen({
 }: {
   w: UseWorlds;
   session: UseSession;
+  onHome: () => void;
   onOpen: () => void;
   onDemo: () => void;
   onForge: () => void;
@@ -71,9 +73,14 @@ export function HomeScreen({
   return (
     <div className={styles.home}>
       <div className={styles.brandRow}>
-        <div className={styles.brand}>
+        <button
+          type="button"
+          className={styles.brand}
+          onClick={onHome}
+          aria-label="回到首页"
+        >
           Mirai<span>·</span>Selene
-        </div>
+        </button>
         <span className={styles.accountActions}>
           <Button variant="secondary" size="sm" onClick={onDemo}>
             <Sparkles size={14} strokeWidth={1.75} aria-hidden />
