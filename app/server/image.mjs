@@ -26,8 +26,18 @@ function ensureArtDir() {
   artDirReady = true;
 }
 
-function artPath(key) {
-  return join(ART_DIR, `${createHash("sha1").update(key).digest("hex").slice(0, 20)}.jpg`);
+const ART_HASH = (key) => createHash("sha1").update(key).digest("hex").slice(0, 20);
+
+function artPath(key, ext = "jpg") {
+  return join(ART_DIR, `${ART_HASH(key)}.${ext}`);
+}
+
+function findArt(key) {
+  for (const ext of ["png", "jpg", "webp"]) {
+    const file = artPath(key, ext);
+    if (existsSync(file)) return `/mirai-art/${basename(file)}`;
+  }
+  return null;
 }
 
 /** 把远端图抓下来存本地，返回同源路径。 */
@@ -50,6 +60,8 @@ export async function cacheArt(key, remoteUrl, timeoutMs = 45_000) {
   }
 }
 
+const ART_MIME = { png: "image/png", jpg: "image/jpeg", webp: "image/webp" };
+
 export function serveArt(req, res, name) {
   ensureArtDir();
   const safe = name.replace(/[^a-z0-9.]/gi, "");
@@ -58,8 +70,9 @@ export function serveArt(req, res, name) {
     res.writeHead(404).end("not found");
     return true;
   }
+  const ext = (safe.split(".").pop() || "jpg").toLowerCase();
   res.writeHead(200, {
-    "Content-Type": "image/jpeg",
+    "Content-Type": ART_MIME[ext] || "image/jpeg",
     // 内容由 key 决定，不会变，可以长缓存
     "Cache-Control": "public, max-age=31536000, immutable",
   });
@@ -108,7 +121,7 @@ export async function handleImage(req, res, { key, readBody }) {
     res.end(JSON.stringify(body));
   };
 
-  if (!key) {
+  if (!key && !process.env.CREDIT_MEDIA_API_KEY) {
     send(200, { url: null, reason: "no-key" });
     return;
   }
@@ -143,11 +156,10 @@ export async function handleImage(req, res, { key, readBody }) {
 
   // 没进内存缓存但盘上有，也不用重画
   ensureArtDir();
-  const onDisk = artPath(keyCache);
-  if (existsSync(onDisk)) {
-    const local = `/mirai-art/${basename(onDisk)}`;
-    CACHE.set(keyCache, local);
-    send(200, { url: local, cached: true });
+  const onDisk = findArt(keyCache);
+  if (onDisk) {
+    CACHE.set(keyCache, onDisk);
+    send(200, { url: onDisk, cached: true });
     return;
   }
 
@@ -156,7 +168,51 @@ export async function handleImage(req, res, { key, readBody }) {
     : buildPrompt(payload);
 
   const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), 60_000);
+  const timer = setTimeout(() => controller.abort(), 90_000);
+
+  const creditKey = process.env.CREDIT_MEDIA_API_KEY || "";
+  const creditBase = (process.env.CREDIT_MEDIA_BASE_URL || "https://api.openai-next.com").replace(/\/+$/, "");
+  const creditModel = process.env.CREDIT_IMAGE_MODEL || "gemini-3.1-flash-image";
+
+  if (creditKey) {
+    try {
+      const upstream = await fetch(`${creditBase}/v1/images/generations`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${creditKey}`, "Content-Type": "application/json" },
+        body: JSON.stringify({ model: creditModel, prompt: prompt.slice(0, 1200), n: 1 }),
+        signal: controller.signal,
+      });
+      const data = await upstream.json().catch(() => ({}));
+      const item = data?.data?.[0] ?? null;
+      if (upstream.ok && item) {
+        ensureArtDir();
+        let local = null;
+        if (item.b64_json) {
+          const buf = Buffer.from(item.b64_json, "base64");
+          if (buf.length > 1024) {
+            const ext = buf[0] === 0x89 ? "png" : buf[0] === 0xff ? "jpg" : "png";
+            const file = artPath(keyCache, ext);
+            writeFileSync(file, buf);
+            local = `/mirai-art/${basename(file)}`;
+          }
+        } else if (item.url) {
+          local = await cacheArt(keyCache, item.url);
+        }
+        if (local) {
+          if (CACHE.size >= MAX) {
+            const oldest = CACHE.keys().next().value;
+            if (oldest !== undefined) CACHE.delete(oldest);
+          }
+          CACHE.set(keyCache, local);
+          send(200, { url: local, prompt, provider: `credit:${creditModel}` });
+          return;
+        }
+      }
+      // 额度/模型问题就往下走 MiniMax，不在这里报死
+    } catch {
+      // 超时或网络失败也继续回退
+    }
+  }
 
   try {
     const upstream = await fetch("https://api.minimax.chat/v1/image_generation", {
