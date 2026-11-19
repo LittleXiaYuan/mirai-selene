@@ -81,7 +81,9 @@ export function serveArt(req, res, name) {
 }
 
 function cacheKey(p) {
-  return [p.place, p.time, p.mood, p.weather, p.worldName].join("|");
+  // 与舞台的缓存口径一致：一个地点在一种天气下只画一次。
+  // 同一地点不同台词的构图差异交给前端淡入，不重复花钱。
+  return [p.place, p.weather].join("|");
 }
 
 function stylePrompt(p) {
