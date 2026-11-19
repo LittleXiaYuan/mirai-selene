@@ -1,3 +1,4 @@
+import { useRef } from "react";
 import { ArrowRight, Play } from "lucide-react";
 import { motion, useReducedMotion } from "motion/react";
 import { Alert } from "@/components/arc/alert/alert";
@@ -33,6 +34,19 @@ export function LandingScreen({
   onWorkspace: () => void;
 }) {
   const reduce = useReducedMotion();
+  const previewRef = useRef<HTMLVideoElement | null>(null);
+  const playPreview = () => {
+    if (reduce) return;
+    const video = previewRef.current;
+    if (!video) return;
+    video.muted = true;
+    void video.play().catch(() => {});
+  };
+  const stopPreview = () => {
+    const video = previewRef.current;
+    if (!video) return;
+    video.pause();
+  };
   const lift = reduce ? undefined : { y: -4 };
 
   return (
@@ -133,8 +147,21 @@ export function LandingScreen({
             target="_blank"
             rel="noreferrer"
             aria-label="播放 78 秒宣传片"
+            onPointerEnter={playPreview}
+            onPointerLeave={stopPreview}
+            onFocus={playPreview}
+            onBlur={stopPreview}
           >
-            <img src="/promo/mirai-promo-poster.jpg" alt="Mirai-Selene 宣传片封面" />
+            <video
+              ref={previewRef}
+              src="/promo/mirai-promo.mp4"
+              poster="/promo/mirai-promo-poster.jpg"
+              muted
+              loop
+              playsInline
+              preload="metadata"
+              aria-hidden
+            />
             <span className={styles.mediaTag}>78s · 2K</span>
             <span className={styles.play}>
               <Play size={20} fill="currentColor" strokeWidth={0} aria-hidden />

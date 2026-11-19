@@ -7,13 +7,18 @@ import type { WorldSpec } from "@/world/spec";
 import { SPEC_SAMPLES } from "@/world/spec-samples";
 import { previewShell } from "./game-shell";
 import { AppTopBar } from "./app-topbar";
+import { useWallet } from "./use-wallet";
 import styles from "./market.module.css";
 
-const LISTINGS: { spec: WorldSpec; tag: string; tone: BadgeTone; note: string }[] = [
-  { spec: SPEC_SAMPLES[0], tag: "免费", tone: "success", note: "轻量、适合第一次走进来" },
-  { spec: SPEC_SAMPLES[1], tag: "编辑推荐", tone: "info", note: "医院与 Offer，两难都保留" },
-  { spec: SPEC_SAMPLES[2], tag: "死局悬赏", tone: "warning", note: "密钥逼宫，谈崩概率高" },
-  { spec: SPEC_SAMPLES[3], tag: "高张力", tone: "danger", note: "举报前夜，证据与恐惧" },
+const byId = (id: string) => SPEC_SAMPLES.find((spec) => spec.id === id) ?? SPEC_SAMPLES[0];
+
+// 价格与 server/market.mjs 的价目表一一对应；服务端仍会按 id 再核一次价。
+const LISTINGS: { spec: WorldSpec; tag: string; tone: BadgeTone; note: string; price: number }[] = [
+  { spec: byId("last-call-demo"), tag: "免费", tone: "success", note: "轻量、适合第一次走进来", price: 0 },
+  { spec: byId("natural-after-school"), tag: "高张力", tone: "danger", note: "一封信，两个人都没说实话", price: 12 },
+  { spec: byId("wednesday-before"), tag: "编辑推荐", tone: "info", note: "医院与 Offer，两难都保留", price: 18 },
+  { spec: byId("dd-before-48h"), tag: "死局悬赏", tone: "warning", note: "密钥逼宫，谈崩概率高", price: 24 },
+  { spec: byId("whistleblower-eve"), tag: "死局悬赏", tone: "danger", note: "举报前夜，证据与恐惧", price: 28 },
 ];
 
 function coverOf(spec: WorldSpec): string | null {
@@ -76,6 +81,20 @@ export function MarketScreen({
   onWorkspace: () => void;
   signedInName?: string;
 }) {
+  const wallet = useWallet(Boolean(signedInName));
+  const buy = async (listing: (typeof LISTINGS)[number]) => {
+    if (!signedInName) {
+      onAuth();
+      return;
+    }
+    try {
+      await wallet.purchase(listing.spec.id);
+      onEnter(listing.spec);
+    } catch {
+      // 错误已经落在 wallet.error 里，界面会显示
+    }
+  };
+
   return (
     <div className={styles.page}>
       <AppTopBar
@@ -93,6 +112,10 @@ export function MarketScreen({
           </p>
         </div>
         <div className={styles.headActions}>
+          {wallet.balance !== null ? (
+            <span className={styles.wallet}>余额 {wallet.balance} · 体验额度</span>
+          ) : null}
+          {wallet.error ? <span className={styles.walletError}>{wallet.error}</span> : null}
           <Button variant="secondary" onClick={onForge}>
             <Sparkles size={16} strokeWidth={1.75} aria-hidden />
             用对话造一个
@@ -128,11 +151,24 @@ export function MarketScreen({
                   ))}
                 </div>
                 <p className={styles.note}>{listing.note}</p>
+                <span className={styles.price}>
+                  {listing.price === 0 ? "免费" : `${listing.price} 额度 · 作者分成 70%`}
+                </span>
                 <div className={styles.actions}>
-                  <Button size="sm" onClick={() => onEnter(listing.spec)}>
-                    导入并走进
-                    <ArrowRight size={14} strokeWidth={2} aria-hidden />
-                  </Button>
+                  {listing.price > 0 && !wallet.owned.has(listing.spec.id) ? (
+                    <Button
+                      size="sm"
+                      loading={wallet.busyId === listing.spec.id}
+                      onClick={() => void buy(listing)}
+                    >
+                      {signedInName ? `购买 · ${listing.price}` : `登录后购买 · ${listing.price}`}
+                    </Button>
+                  ) : (
+                    <Button size="sm" onClick={() => onEnter(listing.spec)}>
+                      导入并走进
+                      <ArrowRight size={14} strokeWidth={2} aria-hidden />
+                    </Button>
+                  )}
                   <Button size="sm" variant="ghost" onClick={() => void previewShell(listing.spec)}>
                     预览游戏壳
                   </Button>

@@ -282,6 +282,12 @@ function card(args) {
 /* 工具表                                                              */
 /* ------------------------------------------------------------------ */
 
+// 市场要钱、要登录态，mcp-core 不直接碰数据库：由 serve.mjs 注入适配器。
+let market = null;
+export function setMarketAdapter(adapter) {
+  market = adapter;
+}
+
 const TOOLS = [
   {
     name: "open_world",
@@ -397,6 +403,23 @@ const TOOLS = [
       type: "object",
       properties: { worldId: { type: "string" }, node: { type: "string" } },
       required: ["worldId", "node"],
+    },
+  },
+  {
+    name: "market_list",
+    description: "列出世界市场的价目表：id、标题、价格（额度）、作者分成。价格由服务端定价，不由调用方传。",
+    inputSchema: { type: "object", properties: {} },
+  },
+  {
+    name: "market_buy",
+    description: "用用户登录 token 购买世界市场里的一份世界：真实扣余额、生成订单，同一份不会重复扣款。",
+    inputSchema: {
+      type: "object",
+      properties: {
+        listingId: { type: "string", description: "市场条目 id，先用 market_list 查" },
+        sessionToken: { type: "string", description: "用户在 mirai-selene 登录后拿到的 token" },
+      },
+      required: ["listingId", "sessionToken"],
     },
   },
   {
@@ -545,6 +568,14 @@ async function publishSpecTool(args) {
 
 const HANDLERS = {
   open_world: openWorld,
+  market_list: async () => {
+    if (!market) throw new Error("市场未接入");
+    return { listings: market.list() };
+  },
+  market_buy: async (args) => {
+    if (!market) throw new Error("市场未接入");
+    return market.buy(args ?? {});
+  },
   preview,
   step,
   branch: makeBranch,

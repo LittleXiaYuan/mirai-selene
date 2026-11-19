@@ -33,13 +33,18 @@ import {
   findSession,
   findUserByEmail,
   findUserById,
+  getWallet,
+  grantCredits,
   getWorld,
+  listOrders,
   listWorlds,
+  purchaseListing,
   updateUserName,
   updateUserPassword,
   upsertWorld,
 } from "./db.mjs";
 import { appUrl, mailConfigured, sendMail } from "./mail.mjs";
+import { findListing, MARKET_LISTINGS } from "./market.mjs";
 
 const MAX_WORLDS_PER_USER = 200;
 
@@ -124,6 +129,8 @@ export async function handleApiRoute({ db, req, res, pathname }) {
 
     const { hash, salt } = await hashPassword(password);
     const user = createUser(db, { id: newId("u"), email, name, passwordHash: hash, salt });
+    // 新账号给 300 体验额度：买得动两份付费世界，走完一次真的扣款与订单。
+    grantCredits(db, user.id, 300, "signup");
     const token = newToken();
     createSession(db, { token, userId: user.id, ttlMs: sessionTtl });
 
@@ -375,6 +382,39 @@ export async function handleApiRoute({ db, req, res, pathname }) {
 
   if (pathname === "/api/auth/email/status" && req.method === "GET") {
     return json(res, 200, { configured: mailConfigured(), appUrl: appUrl() }), true;
+  }
+
+  /* ---------------- 钱包与世界市场 ---------------- */
+
+  if (pathname === "/api/wallet" && req.method === "GET") {
+    const auth = currentUser(db, req);
+    if (!auth) return json(res, 401, { error: "请先登录" }), true;
+    return json(res, 200, {
+      balance: getWallet(db, auth.user.id).balance,
+      orders: listOrders(db, auth.user.id),
+    }), true;
+  }
+
+  if (pathname === "/api/market" && req.method === "GET") {
+    const auth = currentUser(db, req);
+    const orders = auth ? listOrders(db, auth.user.id) : [];
+    const owned = new Set(orders.map((order) => order.listingId));
+    return json(res, 200, {
+      signedIn: Boolean(auth),
+      balance: auth ? getWallet(db, auth.user.id).balance : null,
+      listings: MARKET_LISTINGS.map((listing) => ({ ...listing, owned: owned.has(listing.id) })),
+    }), true;
+  }
+
+  if (pathname === "/api/market/purchase" && req.method === "POST") {
+    const auth = currentUser(db, req);
+    if (!auth) return json(res, 401, { error: "请先登录再购买" }), true;
+    const body = await readJson(req, 10_000);
+    const listing = findListing(String(body.id ?? ""));
+    if (!listing) return json(res, 404, { error: "没有这份世界" }), true;
+    const result = purchaseListing(db, auth.user.id, listing);
+    if (!result.ok) return json(res, 402, result), true;
+    return json(res, 200, { ...result, listing }), true;
   }
 
   /* ---------------- 世界 ---------------- */

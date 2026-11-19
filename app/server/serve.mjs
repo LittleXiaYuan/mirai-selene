@@ -16,10 +16,14 @@ import { createReadStream, existsSync, readFileSync, statSync } from "node:fs";
 import { dirname, extname, join, normalize, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import {
+  findSession,
+  findUserById,
   openDb,
+  purchaseListing,
   purgeExpiredPasswordResets,
   purgeExpiredSessions,
 } from "./db.mjs";
+import { findListing, MARKET_LISTINGS } from "./market.mjs";
 import { currentUser, handleApiRoute, json as jsonOut } from "./api.mjs";
 import { rateLimit, sweepRateLimits } from "./auth.mjs";
 import { handleAct } from "./act.mjs";
@@ -29,7 +33,7 @@ import { paiHealth, paiMerge3, paiStep } from "./pai.mjs";
 import { clearSpec, currentSpec, loadSpec, specHealth } from "./spec.mjs";
 import { assetProvider, generateAsset, planWorld } from "./assets/factory.mjs";
 import { planAssetTasks } from "./assets/prompt-library.mjs";
-import { dispatch as dispatchMcp, setSpecPublisher } from "./mcp-core.mjs";
+import { dispatch as dispatchMcp, setMarketAdapter, setSpecPublisher } from "./mcp-core.mjs";
 import { forgeTurn, startForge } from "./forge.mjs";
 import { renderShell } from "./shell.mjs";
 import { ingestSocial, socialCases } from "./social_ingest.mjs";
@@ -105,6 +109,35 @@ const readBody = async (req) => {
 const MCP_TOKEN = process.env.MCP_TOKEN || "";
 // 让 MCP 的 forge_world / ingest_social / publish_spec 与舞台共享同一份 spec 状态
 setSpecPublisher(loadSpec);
+
+// 市场工具：价格来自服务端价目表，购买校验用户 token，钱从真实钱包扣。
+setMarketAdapter({
+  list: () =>
+    MARKET_LISTINGS.map((listing) => ({
+      id: listing.id,
+      title: listing.title,
+      price: listing.price,
+      tag: listing.tag,
+      summary: listing.summary,
+      authorCut: listing.authorCut,
+    })),
+  buy: ({ listingId, sessionToken }) => {
+    const session = sessionToken ? findSession(db, String(sessionToken)) : null;
+    if (!session) throw new Error("需要有效的登录 token");
+    const user = findUserById(db, session.user_id);
+    if (!user) throw new Error("用户不存在");
+    const listing = findListing(String(listingId ?? ""));
+    if (!listing) throw new Error("没有这份世界");
+    const result = purchaseListing(db, user.id, listing);
+    if (!result.ok) throw new Error(result.error);
+    return {
+      ok: true,
+      already: Boolean(result.already),
+      balance: result.balance,
+      listing: { id: listing.id, title: listing.title, price: listing.price },
+    };
+  },
+});
 
 async function handleMcpHttp(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");

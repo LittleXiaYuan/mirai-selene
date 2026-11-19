@@ -56,6 +56,23 @@ CREATE TABLE IF NOT EXISTS agent_runs (
 );
 CREATE INDEX IF NOT EXISTS idx_agent_runs_owner ON agent_runs(owner_key, created_at DESC);
 
+CREATE TABLE IF NOT EXISTS wallets (
+  user_id    TEXT PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+  balance    INTEGER NOT NULL DEFAULT 0,
+  updated_at TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS orders (
+  id         TEXT PRIMARY KEY,
+  user_id    TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  listing_id TEXT NOT NULL,
+  title      TEXT NOT NULL,
+  price      INTEGER NOT NULL,
+  created_at TEXT NOT NULL,
+  UNIQUE(user_id, listing_id)
+);
+CREATE INDEX IF NOT EXISTS idx_orders_user ON orders(user_id, created_at DESC);
+
 CREATE TABLE IF NOT EXISTS forge_sessions (
   id         TEXT PRIMARY KEY,
   state_json TEXT NOT NULL,
@@ -123,6 +140,79 @@ function migrateWorlds(db) {
   }
 
   db.exec("PRAGMA user_version = 2");
+}
+
+/* ---------------- 钱包与订单 ---------------- */
+
+export function ensureWallet(db, userId) {
+  const now = new Date().toISOString();
+  db.prepare(
+    "INSERT OR IGNORE INTO wallets (user_id, balance, updated_at) VALUES (?, 0, ?)",
+  ).run(userId, now);
+  return Number(db.prepare("SELECT balance FROM wallets WHERE user_id = ?").get(userId).balance);
+}
+
+export function getWallet(db, userId) {
+  const balance = ensureWallet(db, userId);
+  return { balance };
+}
+
+export function grantCredits(db, userId, amount, _reason = "grant") {
+  ensureWallet(db, userId);
+  const now = new Date().toISOString();
+  db.prepare("UPDATE wallets SET balance = balance + ?, updated_at = ? WHERE user_id = ?").run(
+    Math.max(0, Math.floor(amount)),
+    now,
+    userId,
+  );
+  return getWallet(db, userId).balance;
+}
+
+export function listOrders(db, userId) {
+  return db
+    .prepare("SELECT id, listing_id, title, price, created_at FROM orders WHERE user_id = ? ORDER BY created_at DESC")
+    .all(userId)
+    .map((row) => ({
+      id: row.id,
+      listingId: row.listing_id,
+      title: row.title,
+      price: row.price,
+      createdAt: row.created_at,
+    }));
+}
+
+/**
+ * 买一份世界：同一份只收一次钱（UNIQUE），余额不足直接返回，不写半条订单。
+ */
+export function purchaseListing(db, userId, listing) {
+  ensureWallet(db, userId);
+  const owned = db
+    .prepare("SELECT id FROM orders WHERE user_id = ? AND listing_id = ?")
+    .get(userId, listing.id);
+  if (owned) return { ok: true, already: true, balance: getWallet(db, userId).balance };
+
+  const balance = getWallet(db, userId).balance;
+  if (balance < listing.price) {
+    return { ok: false, error: "余额不足", balance };
+  }
+
+  const now = new Date().toISOString();
+  db.exec("BEGIN");
+  try {
+    db.prepare("UPDATE wallets SET balance = balance - ?, updated_at = ? WHERE user_id = ?").run(
+      listing.price,
+      now,
+      userId,
+    );
+    db.prepare(
+      "INSERT INTO orders (id, user_id, listing_id, title, price, created_at) VALUES (?, ?, ?, ?, ?, ?)",
+    ).run(`o_${crypto.randomUUID().slice(0, 12)}`, userId, listing.id, listing.title, listing.price, now);
+    db.exec("COMMIT");
+  } catch (error) {
+    db.exec("ROLLBACK");
+    throw error;
+  }
+  return { ok: true, balance: getWallet(db, userId).balance };
 }
 
 /* ---------------- users ---------------- */

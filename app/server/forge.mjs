@@ -7,12 +7,53 @@
  * 语音张力（tension）会进入世界：说话发虚时，对方会更早看穿你。
  */
 
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { createHash } from "node:crypto";
+import { dirname, join } from "node:path";
 import { planWorld } from "./assets/factory.mjs";
 import { planAssetTasks } from "./assets/prompt-library.mjs";
 import { deleteForgeSession, loadForgeSession, saveForgeSession } from "./agent_store.mjs";
 import { chatJson } from "./llm.mjs";
 
 const TTL_MS = 30 * 60 * 1000;
+
+/**
+ * 同一组六个答案只生成一次。
+ * 现场演示会重复同一组处境，重跑一遍模型既慢又可能给出不同文本；
+ * 缓存让第二次点击是即时的，也让"同一输入两次结果一致"这条验收成立。
+ */
+const CACHE_DIR = join(dirname(process.env.MIRAI_DATA || "./data/mirai.db"), "forge-cache");
+const CACHE_TTL_MS = 14 * 24 * 60 * 60 * 1000;
+
+function cacheKey(answers, tone, tension) {
+  const raw = JSON.stringify([
+    answers.theme, answers.protagonist, answers.opponent,
+    answers.stakes, answers.worst, tone, tension > 0.55 ? 1 : 0,
+  ]);
+  return createHash("sha1").update(raw).digest("hex").slice(0, 16);
+}
+
+function readCache(key) {
+  try {
+    const file = join(CACHE_DIR, `${key}.json`);
+    if (!existsSync(file)) return null;
+    const data = JSON.parse(readFileSync(file, "utf8"));
+    if (!Array.isArray(data?.nodes) || !data.nodes.length) return null;
+    if (Date.now() - Number(data.at || 0) > CACHE_TTL_MS) return null;
+    return data;
+  } catch {
+    return null;
+  }
+}
+
+function writeCache(key, generated) {
+  try {
+    mkdirSync(CACHE_DIR, { recursive: true });
+    writeFileSync(join(CACHE_DIR, `${key}.json`), JSON.stringify({ at: Date.now(), ...generated }));
+  } catch {
+    // 缓存写不进去不影响这次生成
+  }
+}
 
 const STEPS = [
   {
@@ -210,8 +251,8 @@ async function generateWithLLM(answers, baseSpec, { theme, stakes, worst, tone }
     system: "你是互动叙事引擎。只输出合法的 JSON，不解释，不使用 markdown。",
     user: nodePrompt(answers, theme, stakes, worst, tone),
     temperature: 0.85,
-    maxTokens: 3000,
-    timeoutMs: 45_000,
+    maxTokens: 2000,
+    timeoutMs: 25_000,
   });
   if (!result.ok) {
     console.warn(`[forge] LLM ${result.reason} (${result.model}): ${String(result.error).slice(0, 120)}`);
@@ -260,11 +301,21 @@ async function compose(session) {
     ],
   };
 
-  // 先走真实 LLM；额度/网络/格式任何一步失败就回落到本地模板，并在回复里说明。
-  const generated = await generateWithLLM(a, planned.spec, { theme, stakes, worst, tone });
-  let source = "template";
+  // 先查缓存，再走真实 LLM；额度/网络/格式任何一步失败就回落到本地模板，并在回复里说明。
+  const key = cacheKey(a, tone, tension);
+  const cached = readCache(key);
+  let generated = cached
+    ? { title: cached.title, subtitle: cached.subtitle, logline: cached.logline, nodes: cached.nodes }
+    : null;
+  let source = cached ? "cache" : "template";
+  if (!generated) {
+    generated = await generateWithLLM(a, planned.spec, { theme, stakes, worst, tone });
+    if (generated) {
+      writeCache(key, generated);
+      source = "llm";
+    }
+  }
   if (generated) {
-    source = "llm";
     planned.spec.title = generated.title || planned.spec.title;
     planned.spec.subtitle = generated.subtitle || planned.spec.subtitle;
     planned.spec.logline = generated.logline || planned.spec.logline;

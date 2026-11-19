@@ -107,16 +107,15 @@
         controls
         playsinline
         autoplay
-        muted
         preload="metadata"
       ></video>
-      <button class="sound" id="sound" type="button">🔊 开启声音</button>
+      <button class="sound" id="sound" type="button" hidden>🔊 开启声音</button>
     </div>
   </main>
 
   <div class="meta">
     <span><b>78 秒</b> 宣传片 · 2K 原片</span>
-    <span>默认静音起播；声音需要点一下（浏览器策略）</span>
+    <span>尝试带声起播；被浏览器拦截时会静音，点一下即可开启</span>
     <a class="hint" href="/promo/mirai-promo.mp4" style="color:#8b7dff;text-decoration:none">直接下载 mp4</a>
   </div>
 
@@ -132,6 +131,18 @@
   v.addEventListener("volumechange", () => {
     if (!v.muted && btn.isConnected) btn.textContent = "🔊 已开启声音";
   });
+  // 先争取带声起播；被策略拦下再退回静音，并把声音按钮露出来。
+  (async () => {
+    try {
+      v.muted = false;
+      v.volume = 1;
+      await v.play();
+    } catch {
+      v.muted = true;
+      try { await v.play(); } catch {}
+      btn.hidden = false;
+    }
+  })();
 </script>
 </body>
 </html>
