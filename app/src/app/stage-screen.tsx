@@ -1022,6 +1022,7 @@ export function StageScreen({
             <Button variant="ghost" size="sm" className={styles.sysButton} onClick={() => setTab("world")}>
               世界
             </Button>
+            <span className={styles.sysExtra}>
             <span className={styles.sysDivider} aria-hidden />
             <Button variant="ghost" size="sm" className={styles.sysButton} onClick={w.quickSave}>
               Q.Save
@@ -1069,6 +1070,7 @@ export function StageScreen({
             >
               TITLE
             </Button>
+            </span>
           </nav>
         </div>
       </main>

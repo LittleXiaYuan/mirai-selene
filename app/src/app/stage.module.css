@@ -948,3 +948,10 @@
   color: var(--foreground);
   background: color-mix(in oklab, var(--surface) 60%, transparent);
 }
+
+/* 键盘快捷键在手机上没有意义，收进抽屉；保留 朗读 / 回应 / 选项 / 探路 / 世界 */
+@media (max-width: 767px) {
+  .sysExtra {
+    display: none;
+  }
+}
