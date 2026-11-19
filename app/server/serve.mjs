@@ -526,12 +526,19 @@ function serveStatic(req, res, pathname) {
   }
 
   if (!existsSync(file)) {
-    res.writeHead(404, { "Content-Type": "text/html; charset=utf-8" });
-    res.end(`<!doctype html><meta charset="utf-8"><title>404</title>
+    // 前端是单页应用：/about、/market 这类无扩展名深链回落到 index.html，由前端按路径选视图。
+    const spa = join(ROOT, "index.html");
+    const wantsHtml = String(req.headers.accept || "").includes("text/html");
+    if (!extname(pathname) && wantsHtml && existsSync(spa)) {
+      file = spa;
+    } else {
+      res.writeHead(404, { "Content-Type": "text/html; charset=utf-8" });
+      res.end(`<!doctype html><meta charset="utf-8"><title>404</title>
 <body style="font-family:system-ui;background:#07090f;color:#e8ecff;display:grid;place-items:center;height:100vh;margin:0">
 <div style="text-align:center"><h1 style="font-weight:600">404</h1>
 <p style="color:#8b93b8">没有这个页面。回 <a href="/" style="color:#a8c4ff">首页</a>。</p></div></body>`);
-    return;
+      return;
+    }
   }
 
   const ext = extname(file).toLowerCase();

@@ -34,6 +34,22 @@ const Tour = lazy(() => import("./tour").then((m) => ({ default: m.Tour })));
 
 type View = "landing" | "guest" | "forge" | "market" | "ingest" | "auth" | "home" | "stage" | "edit" | "ending" | "compare" | "about";
 
+/** 能直接分享、刷新不丢的视图才有地址；stage/ending 这类仍然只是会话内状态。 */
+const VIEW_PATHS: Partial<Record<View, string>> = {
+  landing: "/",
+  guest: "/world",
+  forge: "/forge",
+  market: "/market",
+  ingest: "/ingest",
+  auth: "/login",
+  about: "/about",
+};
+
+function viewFromPath(pathname: string): View | null {
+  const clean = pathname.replace(/\/+$/, "") || "/";
+  return (Object.keys(VIEW_PATHS) as View[]).find((v) => VIEW_PATHS[v] === clean) ?? null;
+}
+
 const TOUR_KEY = "mirai.tour.v1";
 
 function tourSeen(): boolean {
@@ -98,7 +114,7 @@ export function MiraiApp() {
   const w = useWorlds();
   // 上线产品的入口是宣传页：先回答「这是什么」，再给「直接体验 / 登录」两个动作。
   // 老的世界列表退到「开始体验」之后，不再一进来就甩一屏管理操作。
-  const [view, setView] = useState<View>("landing");
+  const [view, setView] = useState<View>(() => viewFromPath(window.location.pathname) ?? "landing");
   // 邮件里的重置链接形如 /?reset=<token>；解析一次即可。
   const [resetToken, setResetToken] = useState<string | null>(() => {
     try {
@@ -131,6 +147,18 @@ export function MiraiApp() {
   const [tour, setTour] = useState(false);
   const [tourDue, setTourDue] = useState(false);
   const enteredStage = useRef(false);
+
+  // 地址跟着视图走：直链、刷新、浏览器后退都落在同一个位置，而不是一律掉回首页。
+  useEffect(() => {
+    const path = VIEW_PATHS[view];
+    if (path && window.location.pathname !== path) window.history.pushState({ view }, "", path);
+  }, [view]);
+
+  useEffect(() => {
+    const onPop = () => setView(viewFromPath(window.location.pathname) ?? "landing");
+    window.addEventListener("popstate", onPop);
+    return () => window.removeEventListener("popstate", onPop);
+  }, []);
 
   // 默认落在未登录的展示首页：示例世界 + 一句话。登录从右上角进，成功后进工作台。
   // 这样扫码的人先看到「这是什么东西」，而不是一道表单。
