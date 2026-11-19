@@ -459,6 +459,7 @@ export async function ingestSocial({ url = "", text = "", player_faction = "" } 
   let fetched = false;
   let fallback = false;
   let provider = "snapshot";
+  let xhsAttempted = false;
 
   if (String(text).trim()) {
     const body = String(text).trim();
@@ -482,6 +483,7 @@ export async function ingestSocial({ url = "", text = "", player_faction = "" } 
     }
     // 小红书先走真实读取（需要 XHS_COOKIE）；失败再退回通用抓取，最后才是快照。
     if (/xiaohongshu\.com|xhslink/i.test(target) && xhsConfigured()) {
+      xhsAttempted = true;
       try {
         const note = await fetchXhsNote(target);
         snapshot = {
@@ -498,12 +500,15 @@ export async function ingestSocial({ url = "", text = "", player_faction = "" } 
           })),
           polarization: 0.72,
           captured_at: new Date().toISOString(),
-          note: `小红书真实读取 · ${note.comments.length} 条评论`,
+          note: note.commentsFetched
+            ? `小红书真实读取 · ${note.comments.length} 条评论`
+            : "小红书真实读取 · 正文与标签已取，评论被风控拦下",
         };
         fetched = true;
         provider = "xhs";
-      } catch {
-        // 登录态过期或链接缺 xsec_token，继续走下面的通用抓取
+      } catch (error) {
+        // 登录态过期、缺 xsec_token 或被风控；原因留在服务端日志里，别静默。
+        console.warn(`[xhs] real read failed: ${error instanceof Error ? error.message : String(error)}`);
       }
     }
 
@@ -534,7 +539,9 @@ export async function ingestSocial({ url = "", text = "", player_faction = "" } 
         note:
           /xiaohongshu\.com|xhslink/i.test(target) && !xhsConfigured()
             ? "未配置小红书登录态（XHS_COOKIE），这一版是示例快照"
-            : "平台反爬或网络不可达，使用内置快照",
+            : xhsAttempted
+              ? "小红书读取失败：链接里的 xsec_token 可能已过期，从浏览器地址栏重新复制一次完整链接"
+              : "平台反爬或网络不可达，使用内置快照",
       };
     }
   } else {

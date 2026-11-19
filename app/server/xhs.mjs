@@ -23,7 +23,8 @@ function run(args, timeout = 25_000) {
       { timeout, maxBuffer: 8 * 1024 * 1024, windowsHide: true },
       (error, stdout, stderr) => {
         if (error) {
-          reject(new Error(String(stderr || error.message).trim().slice(0, 200)));
+          const tail = String(stderr || error.message).trim().split("\n").slice(-3).join(" | ");
+          reject(new Error(tail.slice(0, 240)));
           return;
         }
         resolve(String(stdout));
@@ -54,6 +55,7 @@ export async function fetchXhsNote(url) {
     .slice(0, 8);
 
   let comments = [];
+  let commentsFetched = false;
   try {
     const parsed = parseJson(await run(["comments", url, "--all"], 30_000));
     const list = parsed.comments ?? parsed.data?.comments ?? [];
@@ -62,6 +64,7 @@ export async function fetchXhsNote(url) {
       likes: Number(comment.like_count ?? comment.likes ?? 0),
       author: String(comment.user?.nickname ?? comment.user_info?.nickname ?? ""),
     })).filter((comment) => comment.text);
+    commentsFetched = true;
   } catch {
     // 评论抓不到不算失败：正文与标签仍然可用
   }
@@ -71,6 +74,7 @@ export async function fetchXhsNote(url) {
     body: body || title,
     tags,
     comments,
+    commentsFetched,
     likes: Number(note.interact_info?.liked_count ?? 0),
     collects: Number(note.interact_info?.collected_count ?? 0),
   };
